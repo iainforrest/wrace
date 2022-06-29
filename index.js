@@ -2,11 +2,14 @@
 const keyboardLetters1 = ['q','w','e','r','t','y','u','i','o','p'];
 const keyboardLetters2 = ['a','s','d','f','g','h','j','k','l'];
 const keyboardLetters3 = ['←','z','x','c','v','b','n','m','enter'];
-const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['←','z','x','c','v','b','n','m','enter']]
+const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['←','z','x','c','v','b','n','m','↲']]
 
 var startGame = 0;
 var letterBoxHTML = "<div class='letterBox'></div>";
+var keyboardRowHTML = '<div class="keyboardRow"></div>';
+var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
+//countdown Timer
 function countdownTimer(countdown) {
   var x = setInterval(function() {
     $("#count").text(countdown)
@@ -18,6 +21,7 @@ function countdownTimer(countdown) {
   },1000);
 }
 
+//function to create multiple instances of the same html
 function insertHTMLBlock (container, htmlText, loops) {
   for (i=0; i<loops; i++) {
     $(container).append(htmlText);
@@ -25,35 +29,35 @@ function insertHTMLBlock (container, htmlText, loops) {
 }
 
 insertHTMLBlock('.wordContainer', letterBoxHTML, 5);
-insertHTMLBlock('.keyboard','<div class="keyboardRow"></div>',3);
 
-//add row-x to each row to allow selection
-$('.keyboardRow').each(function(index){
-  $(this).addClass("row-" + (index+1));
-});
+//keyboard
+insertHTMLBlock('.keyboard',keyboardRowHTML,3); //create 3 rows
 
-insertHTMLBlock('.row-1',"<button class='keyBtn'></button>",keyboardLetters1.length);
-$('.row-1 .keyBtn').each(function(index){
-    $(this).text(keyboardLetters1[index]);
-});
-insertHTMLBlock('.row-2',"<button class='keyBtn'></button>",keyboardLetters2.length);
-$('.row-2 .keyBtn').each(function(index){
-    $(this).text(keyboardLetters2[index]);
-});
-insertHTMLBlock('.row-3',"<button class='keyBtn'></button>",keyboardLetters3.length);
-$('.row-3 .keyBtn').each(function(index){
-    $(this).text(keyboardLetters3[index]);
+$('.keyboardRow').each(function(ind){  //for each row
+  $(this).addClass("row-" + (ind+1));  //add class row-x
+  keyboardLetters[ind].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
+    $('.row-'+(ind+1)).append(buttonKeyHTML); //append button HTML
+    $('.keyBtn').last().attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
+  });  
 });
 
 
-// keyboardLetters1.forEach((item, i) => {
-//   $
-// });
 
 
-$(document).keydown(function(){
-  if (startGame == 0) {
+
+
+$(document).keydown(function(e){
+  if (startGame == 0) { //start timer if game hasn't started
     startGame = 1;
     countdownTimer(15);
   }
+  //else if (key = letter) { //do this with key if game is running
+    //find what key
+    //add letter to next empty box
+//  }
+  //else if key = enter
+    //submit
+//
+  //else if key = backspace
+    //remove last input
 })
