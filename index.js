@@ -2,12 +2,12 @@
 const keyboardLetters1 = ['q','w','e','r','t','y','u','i','o','p'];
 const keyboardLetters2 = ['a','s','d','f','g','h','j','k','l'];
 const keyboardLetters3 = ['←','z','x','c','v','b','n','m','enter'];
-const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['←','z','x','c','v','b','n','m','↲']]
+const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 
 var startGame = 0;
 var letterBoxHTML = "<div class='letterBox'></div>";
-var keyboardRowHTML = '<div class="keyboardRow"></div>';
-var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
+var keyboardRowHTML = '<div class="keyboardRow row justify-content-center"></div>';
+var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn col-1'></button>"
 
 //countdown Timer
 function countdownTimer(countdown) {
@@ -38,8 +38,10 @@ $('.keyboardRow').each(function(ind){  //for each row
   keyboardLetters[ind].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
     $('.row-'+(ind+1)).append(buttonKeyHTML); //append button HTML
     $('.keyBtn').last().attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
-  });  
+  });
 });
+$('.row-3 .keyBtn').first().removeClass('col-1').addClass('col-15');
+$('.row-3 .keyBtn').last().removeClass('col-1').addClass('col-15');
 
 
 
