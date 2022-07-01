@@ -4,17 +4,23 @@ body {
   width: 60%;
 }
 
+button:active{
+    border: 2px solid #888888;
+    box-shadow: 2px 2px #888888;
+}
+
+.col-1 {
+  width: 8.5%;
+}
+
 .col-15 {
-  width: 12.499999995%;
+  width: 12.5%;
 }
 
 .letterBox {
-  border: 5px solid #444444;
-  display: inline-block;
-  margin: 0 5px;
-  width: 50px;
-  height: 50px;
-
+  border: 3px solid #888888;
+  margin: 0 3px;
+  height: 58px;
 }
 
 .keyboard {
@@ -39,5 +45,11 @@ body {
   font-size: 1.5rem;
   line-height: 1.5rem;
   text-transform: uppercase;
+}
+
+.wordContainer{
+  display: flex;
+  justify-content: center;
+  margin: 50px auto;
 
 }

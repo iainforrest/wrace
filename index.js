@@ -5,9 +5,9 @@ const keyboardLetters3 = ['←','z','x','c','v','b','n','m','enter'];
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 
 var startGame = 0;
-var letterBoxHTML = "<div class='letterBox'></div>";
-var keyboardRowHTML = '<div class="keyboardRow row justify-content-center"></div>';
-var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn col-1'></button>"
+var letterBoxHTML = "<div class='letterBox col-15'></div>";
+var keyboardRowHTML = '<div class="keyboardRow"></div>';
+var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
 //countdown Timer
 function countdownTimer(countdown) {
@@ -37,11 +37,15 @@ $('.keyboardRow').each(function(ind){  //for each row
   $(this).addClass("row-" + (ind+1));  //add class row-x
   keyboardLetters[ind].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
     $('.row-'+(ind+1)).append(buttonKeyHTML); //append button HTML
-    $('.keyBtn').last().attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
+    if ((value == '⌫') || (value == '↲') ){ //extra wide button for del and enter
+      $('.keyBtn').last().addClass('col-15').attr("data-key", value).text(value);
+    }
+    else {
+      $('.keyBtn').last().addClass('col-1').attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
+    }
   });
 });
-$('.row-3 .keyBtn').first().removeClass('col-1').addClass('col-15');
-$('.row-3 .keyBtn').last().removeClass('col-1').addClass('col-15');
+
 
 
 
