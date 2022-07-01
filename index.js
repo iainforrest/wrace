@@ -1,11 +1,14 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
+const numberOfGuesses = 5;
+const timerLength = 14;
 
 var startGame = 0;
-var letterBoxHTML = "<div class='letterBox col-15'></div>";
+var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
+var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
-var guess = 0;
+var nextLetter = [0,1,2,3,4];
 
 function gameOver(){
   $("#count").text("Game Over");
@@ -23,31 +26,31 @@ function countdownTimer(countdown) {
   },1000);
 }
 
-//function to create multiple instances of the same html
-function insertHTMLBlock (container, htmlText, loops) {
-  for (i=0; i<loops; i++) {
-    $(container).append(htmlText);
+//create game board rows
+for (i=0; i<numberOfGuesses; i++) {- // 5 rows
+  $('.wordContainer').append(letterBoxRowHTML);  //add row
+  for (j=0; j<5; j++){
+    $('.letterBoxRow').last().append(letterBoxHTML);  // ad 5 boxes to each row
   }
+
 }
 
-insertHTMLBlock('.wordContainer', letterBoxHTML, 5);
-var nextLetterBox = $('.letterBox:empty').first();
+var nextLetterBox = $('.letterBox:empty').first(); //gets next box with nothing in it
 
 //keyboard
-insertHTMLBlock('.keyboard',keyboardRowHTML,3); //create 3 rows
-
-$('.keyboardRow').each(function(ind){  //for each row
-  $(this).addClass("row-" + (ind+1));  //add class row-x
-  keyboardLetters[ind].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
-    $('.row-'+(ind+1)).append(buttonKeyHTML); //append button HTML
+for (i=0; i<3; i++){ // 3 rows
+  $('.keyboard').append(keyboardRowHTML); //append row
+  keyboardLetters[i].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
+    $('.keyboardRow').last().append(buttonKeyHTML); //append button HTML
     if ((value == '⌫') || (value == '↲') ){ //extra wide button for del and enter
       $('.keyBtn').last().addClass('col-15').attr("data-key", value).text(value);
-    }
-    else {
+    }else {
       $('.keyBtn').last().addClass('col-1').attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
     }
   });
-});
+}
+
+
 
 $('.keyBtn').click(function(){
   if (startGame == 1){
@@ -74,6 +77,7 @@ $('.keyBtn').click(function(){
 $('#count').click(function(){
   if (startGame == 0) { //start timer if game hasn't started
     startGame = 1;
-    countdownTimer(15);
+    $('#count').text(timerLength+1).removeClass("startButton");
+    countdownTimer(timerLength);
   }
 })

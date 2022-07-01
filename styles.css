@@ -9,6 +9,15 @@ button:active{
     box-shadow: 2px 2px #888888;
 }
 
+.startButton {
+  border-radius: 2rem;
+  background-color: #aaaaaa;
+  width: fit-content;
+  padding: 2px 20px;
+  cursor: pointer;
+  margin:auto;
+}
+
 .col-1 {
   width: 8.5%;
 }
@@ -17,12 +26,19 @@ button:active{
   width: 12.5%;
 }
 
+.letterBoxRow {
+  margin: 3px 0;
+  display: flex;
+  justify-content: center;
+}
+
 .letterBox {
-  border: 3px solid #888888;
+  border: 1px solid #aaaaaa;
   display: flex;
   margin: 0 3px;
-  height: 4rem;
-  font-size: 2.5rem;
+  height: 62px;
+  width: 62px;
+  font-size: 2.2rem;
   text-transform: uppercase;
   justify-content: center;
   align-items: center;
@@ -54,6 +70,7 @@ button:active{
 
 .wordContainer{
   display: flex;
+  flex-direction: column;
   justify-content: center;
   margin: 50px auto;
 
