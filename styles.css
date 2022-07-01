@@ -1,7 +1,7 @@
 body {
   margin: auto;
   text-align: center;
-  width: 60%;
+  max-width: 500px;
 }
 
 button:active{
@@ -19,8 +19,13 @@ button:active{
 
 .letterBox {
   border: 3px solid #888888;
+  display: flex;
   margin: 0 3px;
-  height: 58px;
+  height: 4rem;
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  justify-content: center;
+  align-items: center;
 }
 
 .keyboard {

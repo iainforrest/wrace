@@ -1,7 +1,3 @@
-
-const keyboardLetters1 = ['q','w','e','r','t','y','u','i','o','p'];
-const keyboardLetters2 = ['a','s','d','f','g','h','j','k','l'];
-const keyboardLetters3 = ['←','z','x','c','v','b','n','m','enter'];
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 
 var startGame = 0;
@@ -9,13 +5,19 @@ var letterBoxHTML = "<div class='letterBox col-15'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
+var guess = 0;
+
+function gameOver(){
+  $("#count").text("Game Over");
+}
+
 //countdown Timer
 function countdownTimer(countdown) {
   var x = setInterval(function() {
     $("#count").text(countdown)
     countdown--;
     if (countdown == -1) {
-      $("#count").text("Game Over")
+      gameOver();
       clearInterval(x);
     }
   },1000);
@@ -29,6 +31,7 @@ function insertHTMLBlock (container, htmlText, loops) {
 }
 
 insertHTMLBlock('.wordContainer', letterBoxHTML, 5);
+var nextLetterBox = $('.letterBox:empty').first();
 
 //keyboard
 insertHTMLBlock('.keyboard',keyboardRowHTML,3); //create 3 rows
@@ -46,24 +49,31 @@ $('.keyboardRow').each(function(ind){  //for each row
   });
 });
 
+$('.keyBtn').click(function(){
+  if (startGame == 1){
+    let keyPressed = $(this).attr("data-key")
+    switch (keyPressed) {
+      case '⌫':
+        alert('backspace pressed');
+        break;
+      case '↲':
+          alert('enter pressed');
+        break;
+      default:
+        nextLetterBox.text(keyPressed);
+        nextLetterBox = $('.letterBox:empty').first();
+    }
+  }
+
+});
 
 
 
 
 
-
-$(document).keydown(function(e){
+$('#count').click(function(){
   if (startGame == 0) { //start timer if game hasn't started
     startGame = 1;
     countdownTimer(15);
   }
-  //else if (key = letter) { //do this with key if game is running
-    //find what key
-    //add letter to next empty box
-//  }
-  //else if key = enter
-    //submit
-//
-  //else if key = backspace
-    //remove last input
 })
