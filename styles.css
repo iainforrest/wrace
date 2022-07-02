@@ -26,6 +26,10 @@ button:active{
   width: 12.5%;
 }
 
+.correct{
+  background-color: lightgreen;
+}
+
 .letterBoxRow {
   margin: 3px 0;
   display: flex;
