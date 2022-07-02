@@ -1,10 +1,10 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 5;
 const timerLength = 14;
-const secretWord = "mined";
+const secretWord = "hello";
 
-var correctLetters = [4,2,1];
-var lettersLeft = [];
+var correctLetters = [4,1];
+var lettersToCheck = [];
 var attempt = 0;
 var currentRow;
 var nextLetterBox;
@@ -15,11 +15,17 @@ var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
-for (i=0; i<5; i++){
-  if (correctLetters.indexOf(i) == -1) {
-      lettersLeft.push(i);
+
+function lettersLeft() {
+  let x = [];
+  for (i=0; i<5; i++){
+    if (correctLetters.indexOf(i) == -1) {
+        x.push(i);
+    }
   }
+  return x;
 }
+
 
 
 function gameOver(){
@@ -79,30 +85,43 @@ function getAllIndexes(arr, val) {
   return indexes;
   }
 
+
+// function correctPosition(index, value) {
+//   currentRow.children().eq(value).addClass("correct");
+//   lettersLeft.splice(index,1); // remove letter from letters to check for next round
+//   correctLetters.push(value); //add position to correct letters so that it loads as green on next round
+//
+// }
+
 //check if word is correct on enter
 function checkWord() {
-  let lettersToCheck = lettersLeft;
-  lettersToCheck.forEach(function(value,index,array) {
-    let letterToCheck = currentRow.children().eq(value).html();
-    let instances = getAllIndexes(secretWord, letterToCheck);//check for multiple letters
-    if (instances.length == 0) {
-      return;
-    } else if (instances.length == 1){ //letter is in word one time
-        if (instances[0] == value){
-          //correct position
-          console.log("correct position");
-          lettersLeft.splice(index,1);
-          correctLetters.push(value);
-        }else {
-        // correct letter wrong position
-        console.log("correct letter, wrong position");
+  lettersToCheck = lettersLeft();  //make coopy of letters left so that we can edit letters left if letter is found
+  lettersToCheck.forEach(function(value,index,array) { //for each letter left eg.[0,3]
+    let letterToCheck = currentRow.children().eq(value).html(); //letterbox[0].text -what the player has guessed.
+    let instances = getAllIndexes(secretWord, letterToCheck);//get indexes of all instances of guessed letter in the secret word. eg l in hello = [2,3] / p in hello = []
+    if (instances.length == 0) { //is [] then leter is not in secret word
+      currentRow.children().eq(value).addClass("wrong");
+      return;                    //do nothing - go to next guessed letter
+    }
+    else {  //letter exists in secret word
+      instances.some(function(inst) { // for each index of the letter in secret ie l = [2,3]
+        if (!correctLetters.includes(inst)){  // check if [2] is in correct letters- if it is then skip it (helps for doubble letters)
+          if (inst == value){ // if it isn't in correct letters and the index of the instance matches the index of the guest then it is right word right place
+            currentRow.children().eq(value).removeClass("wrongPosition").addClass("correct");
+            correctLetters.push(value);
+            return true;
+          }else {
+            currentRow.children().eq(value).addClass("wrongPosition");
+          // correct letter wrong position
+          console.log("correct letter, wrong position");
+          }
         }
-    } else {
-      //multiple instances
+      });
     }
   });
 
 }
+
 
 //start game
 $('#count').click(function(){
@@ -125,13 +144,12 @@ $('.keyBtn').click(function(){
         alert('backspace pressed');
         break;
       case '↲':
-          alert('enter pressed');
           checkWord();
-          if (lettersLeft.length > 0) {
+          if (correctLetters.length < 5) {
             attempt ++;
             loadGameBoardRow();
           }else {
-            alert("you win")
+            console.log("you win");
           }
 
         break;

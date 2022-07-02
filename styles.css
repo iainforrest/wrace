@@ -1,4 +1,5 @@
 body {
+  font-family: Arial, Helvetica, sans-serif;
   margin: auto;
   text-align: center;
   max-width: 500px;
@@ -27,7 +28,18 @@ button:active{
 }
 
 .correct{
-  background-color: lightgreen;
+  background-color: #6aaa64;
+  color: white;
+}
+
+.wrongPosition {
+  background-color: #c9b458;
+  color: white;
+}
+
+.wrong {
+  background-color: #787c7e;
+  color: white;
 }
 
 .letterBoxRow {
@@ -43,6 +55,7 @@ button:active{
   height: 62px;
   width: 62px;
   font-size: 2.2rem;
+  font-weight: bold;
   text-transform: uppercase;
   justify-content: center;
   align-items: center;
