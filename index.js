@@ -8,6 +8,7 @@ var lettersToCheck = [];
 var attempt = 0;
 var currentRow;
 var nextLetterBox;
+var lastLetterBox =[];
 
 var startGame = 0;
 var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
@@ -141,11 +142,16 @@ $('.keyBtn').click(function(){
     //case statement del, enter, other letter
     switch (keyPressed) {
       case '⌫':
-        alert('backspace pressed');
+        let delBox = lastLetterBox.pop(); // get last item from letterbox list
+        if (delBox != null){ // if it's not empty ie. no letters currently entered
+          delBox.text(""); //delete it`
+          nextLetterBox = $('.letterBox:empty').first(); // reset next letterbox
+        }
         break;
       case '↲':
           checkWord();
           if (correctLetters.length < 5) {
+            lastLetterBox = []; // clear delete list
             attempt ++;
             loadGameBoardRow();
           }else {
@@ -156,6 +162,7 @@ $('.keyBtn').click(function(){
       default:
         if (nextLetterBox.parent()[0] == currentRow[0]){ //only enter text if the next empty box is on the current row
           nextLetterBox.text(keyPressed);
+          lastLetterBox.push(nextLetterBox); // add letterbox reference to last letter box for deleteing if needed
           nextLetterBox = $('.letterBox:empty').first();
         }
 
