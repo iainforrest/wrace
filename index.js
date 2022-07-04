@@ -1,14 +1,16 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 5;
 const timerLength = 14;
-const secretWord = "hello";
+const secretWord = wordArray[Math.floor(Math.random()*2315)];
 
-var correctLetters = [4,1];
+var correctLetters = [0,1,3];
 var lettersToCheck = [];
 var attempt = 0;
 var currentRow;
 var nextLetterBox;
 var lastLetterBox =[];
+
+var rowComplete = 0;
 
 var startGame = 0;
 var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
@@ -16,15 +18,38 @@ var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
+//create game board rows
+for (i=0; i<numberOfGuesses; i++) {- // 5 rows
+  $('.wordContainer').append(letterBoxRowHTML);  //add row
+  for (j=0; j<5; j++){
+    $('.letterBoxRow').last().append(letterBoxHTML);  // ad 5 boxes to each row
+  }
 
+}
+
+//create keyboard
+for (i=0; i<3; i++){ // 3 rows
+  $('.keyboard').append(keyboardRowHTML); //append row
+  keyboardLetters[i].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
+    $('.keyboardRow').last().append(buttonKeyHTML); //append button HTML
+    if ((value == '⌫') || (value == '↲') ){ //extra wide button for del and enter
+      $('.keyBtn').last().addClass('col-15').attr("data-key", value).text(value);
+    }else {
+      $('.keyBtn').last().addClass('col-1').attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
+    }
+  });
+}
+
+
+// get the indexs of the letters that are left to check.
 function lettersLeft() {
-  let x = [];
-  for (i=0; i<5; i++){
-    if (correctLetters.indexOf(i) == -1) {
+  let x = [];  // create empty array
+  for (i=0; i<5; i++){  //loop through indexs 0-4
+    if (correctLetters.indexOf(i) == -1) { // if index is NOT in correct letters, then add to index
         x.push(i);
     }
   }
-  return x;
+  return x; // return index of letters left to get
 }
 
 
@@ -45,36 +70,30 @@ function countdownTimer(countdown) {
   },1000);
 }
 
-//create game board rows
-for (i=0; i<numberOfGuesses; i++) {- // 5 rows
-  $('.wordContainer').append(letterBoxRowHTML);  //add row
-  for (j=0; j<5; j++){
-    $('.letterBoxRow').last().append(letterBoxHTML);  // ad 5 boxes to each row
-  }
-
-}
-
-//keyboard
-for (i=0; i<3; i++){ // 3 rows
-  $('.keyboard').append(keyboardRowHTML); //append row
-  keyboardLetters[i].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
-    $('.keyboardRow').last().append(buttonKeyHTML); //append button HTML
-    if ((value == '⌫') || (value == '↲') ){ //extra wide button for del and enter
-      $('.keyBtn').last().addClass('col-15').attr("data-key", value).text(value);
-    }else {
-      $('.keyBtn').last().addClass('col-1').attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
-    }
-  });
-}
 
 
 //Load hints onto the current row
 function loadGameBoardRow() {
-  currentRow = $('.letterBoxRow').eq(attempt);
-  correctLetters.forEach(function (position){
+  rowComplete = 0; // reset so that enter doesn't work
+  lastLetterBox = []; // clear delete list
+  currentRow = $('.letterBoxRow').eq(attempt); // use "attempt" to set up the current row
+  correctLetters.forEach(function (position){  //loop through current letters and put them on the row
     currentRow.children().eq(position).addClass("correct").text(secretWord[position]);
   });
   nextLetterBox = $('.letterBox:empty').first();
+}
+
+//delete button
+function deleteButtonPressed(){
+  let delBox = lastLetterBox.pop(); // get last item from letterbox list
+  if (delBox != null){ // if it's not empty ie. no letters currently entered
+    delBox.text(""); //delete it`
+    nextLetterBox = $('.letterBox:empty').first(); // reset next letterbox
+    if (rowComplete == 1){
+      currentRow.children().removeClass("wordDoesntExist");
+      rowComplete = 0;
+    }
+  }
 }
 
 //check if letter exists in more than one place
@@ -87,18 +106,22 @@ function getAllIndexes(arr, val) {
   }
 
 
-// function correctPosition(index, value) {
-//   currentRow.children().eq(value).addClass("correct");
-//   lettersLeft.splice(index,1); // remove letter from letters to check for next round
-//   correctLetters.push(value); //add position to correct letters so that it loads as green on next round
-//
-// }
+function checkRow(){
+  rowComplete = 1;
+  let word = ""
+  for (i=0; i<5; i++){
+    word += currentRow.children().eq(i).html();
+  }
+  if (!wordList.has(word.toUpperCase())){
+    currentRow.children().addClass("wordDoesntExist");
+  }
+}
 
 //check if word is correct on enter
 function checkWord() {
   lettersToCheck = lettersLeft();  //make coopy of letters left so that we can edit letters left if letter is found
   lettersToCheck.forEach(function(value,index,array) { //for each letter left eg.[0,3]
-    let letterToCheck = currentRow.children().eq(value).html(); //letterbox[0].text -what the player has guessed.
+    let letterToCheck = currentRow.children().eq(value).html().toUpperCase(); //letterbox[0].text -what the player has guessed.
     let instances = getAllIndexes(secretWord, letterToCheck);//get indexes of all instances of guessed letter in the secret word. eg l in hello = [2,3] / p in hello = []
     if (instances.length == 0) { //is [] then leter is not in secret word
       currentRow.children().eq(value).addClass("wrong");
@@ -142,28 +165,27 @@ $('.keyBtn').click(function(){
     //case statement del, enter, other letter
     switch (keyPressed) {
       case '⌫':
-        let delBox = lastLetterBox.pop(); // get last item from letterbox list
-        if (delBox != null){ // if it's not empty ie. no letters currently entered
-          delBox.text(""); //delete it`
-          nextLetterBox = $('.letterBox:empty').first(); // reset next letterbox
-        }
+        deleteButtonPressed();
         break;
       case '↲':
-          checkWord();
+        if (rowComplete == 1){
           if (correctLetters.length < 5) {
-            lastLetterBox = []; // clear delete list
+            checkWord();
             attempt ++;
             loadGameBoardRow();
           }else {
             console.log("you win");
           }
-
+        }
         break;
       default:
         if (nextLetterBox.parent()[0] == currentRow[0]){ //only enter text if the next empty box is on the current row
           nextLetterBox.text(keyPressed);
           lastLetterBox.push(nextLetterBox); // add letterbox reference to last letter box for deleteing if needed
           nextLetterBox = $('.letterBox:empty').first();
+          if (nextLetterBox.parent()[0] != currentRow[0]){
+            checkRow();
+          }
         }
 
     }

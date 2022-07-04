@@ -10,6 +10,8 @@ button:active{
     box-shadow: 2px 2px #888888;
 }
 
+
+/* Title Section and gameboard */
 .startButton {
   border-radius: 2rem;
   background-color: #aaaaaa;
@@ -27,20 +29,6 @@ button:active{
   width: 12.5%;
 }
 
-.correct{
-  background-color: #6aaa64;
-  color: white;
-}
-
-.wrongPosition {
-  background-color: #c9b458;
-  color: white;
-}
-
-.wrong {
-  background-color: #787c7e;
-  color: white;
-}
 
 .letterBoxRow {
   margin: 3px 0;
@@ -91,4 +79,24 @@ button:active{
   justify-content: center;
   margin: 50px auto;
 
+}
+
+/* Checking if letters and words are correct or exist */
+.correct{
+  background-color: #6aaa64;
+  color: white;
+}
+
+.wrongPosition {
+  background-color: #c9b458;
+  color: white;
+}
+
+.wrong {
+  background-color: #787c7e;
+  color: white;
+}
+
+.wordDoesntExist {
+  color: red;
 }
