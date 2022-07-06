@@ -1,14 +1,15 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 5;
 const timerLength = 14;
-const secretWord = wordArray[Math.floor(Math.random()*2315)];
+const secretWord = "HELLO"//wordArray[Math.floor(Math.random()*2315)];
 
-var correctLetters = [0,1,3];
+var hints = [0,1,3];
 var lettersToCheck = [];
 var attempt = 0;
 var currentRow;
 var nextLetterBox;
 var lastLetterBox =[];
+var currentGuess = "";
 
 var rowComplete = 0;
 
@@ -41,16 +42,16 @@ for (i=0; i<3; i++){ // 3 rows
 }
 
 
-// get the indexs of the letters that are left to check.
-function lettersLeft() {
-  let x = [];  // create empty array
-  for (i=0; i<5; i++){  //loop through indexs 0-4
-    if (correctLetters.indexOf(i) == -1) { // if index is NOT in correct letters, then add to index
-        x.push(i);
-    }
-  }
-  return x; // return index of letters left to get
-}
+// // get the indexs of the letters that are left to check.
+// function lettersLeft() {
+//   let x = [];  // create empty array
+//   for (i=0; i<5; i++){  //loop through indexs 0-4
+//     if (hints.indexOf(i) == -1) { // if index is NOT in correct letters, then add to index
+//         x.push(i);
+//     }
+//   }
+//   return x; // return index of letters left to get
+// }
 
 
 
@@ -73,13 +74,23 @@ function countdownTimer(countdown) {
 
 
 //Load hints onto the current row
+function loadGameBoardHintRow() {
+  currentRow = $('.letterBoxRow').eq(0); // Top row
+  for (i=0; i<secretWord.length; i++){
+    if (hints.indexOf(i) != -1) {
+      currentRow.children().eq(i).addClass("correct").text(secretWord[i]);
+    } else {
+      currentRow.children().eq(i).addClass("wrong").text("*");
+    }
+  }
+  nextLetterBox = $('.letterBox:empty').first();
+}
+
+//Load hints onto the current row
 function loadGameBoardRow() {
   rowComplete = 0; // reset so that enter doesn't work
   lastLetterBox = []; // clear delete list
   currentRow = $('.letterBoxRow').eq(attempt); // use "attempt" to set up the current row
-  correctLetters.forEach(function (position){  //loop through current letters and put them on the row
-    currentRow.children().eq(position).addClass("correct").text(secretWord[position]);
-  });
   nextLetterBox = $('.letterBox:empty').first();
 }
 
@@ -108,17 +119,35 @@ function getAllIndexes(arr, val) {
 
 function checkRow(){
   rowComplete = 1;
-  let word = ""
+  currentGuess = ""
   for (i=0; i<5; i++){
-    word += currentRow.children().eq(i).html();
+    currentGuess += currentRow.children().eq(i).html().toUpperCase();
   }
-  if (!wordList.has(word.toUpperCase())){
+  if (!wordList.has(currentGuess)) {
     currentRow.children().addClass("wordDoesntExist");
   }
 }
 
+function checkWord(){
+  Array.from(currentGuess).forEach(function(elt, i, guess){
+    currentRow.children().eq(i).addClass("wrong");
+    let multiLetter = getAllIndexes(secretWord, elt);
+    multiLetter.forEach(function(MLElt, MLi) {
+      if (MLElt == i) {
+        currentRow.children().eq(i).removeClass("wrong").removeClass("wrongPosition").addClass("correct");
+      }
+      else if (secretWord[MLElt] == currentGuess[MLElt]) {
+        return;
+      }
+      else if(multiLetter.length >= getAllIndexes(currentGuess, elt).length) {
+        currentRow.children().eq(i).removeClass("wrong").addClass("wrongPosition");
+      }
+    });
+  });
+}
+
 //check if word is correct on enter
-function checkWord() {
+function checkWordOLD() {
   lettersToCheck = lettersLeft();  //make coopy of letters left so that we can edit letters left if letter is found
   lettersToCheck.forEach(function(value,index,array) { //for each letter left eg.[0,3]
     let letterToCheck = currentRow.children().eq(value).html().toUpperCase(); //letterbox[0].text -what the player has guessed.
@@ -129,10 +158,10 @@ function checkWord() {
     }
     else {  //letter exists in secret word
       instances.some(function(inst) { // for each index of the letter in secret ie l = [2,3]
-        if (!correctLetters.includes(inst)){  // check if [2] is in correct letters- if it is then skip it (helps for doubble letters)
+        if (!hints.includes(inst)){  // check if [2] is in correct letters- if it is then skip it (helps for doubble letters)
           if (inst == value){ // if it isn't in correct letters and the index of the instance matches the index of the guest then it is right word right place
             currentRow.children().eq(value).removeClass("wrongPosition").addClass("correct");
-            correctLetters.push(value);
+            hints.push(value);
             return true;
           }else {
             currentRow.children().eq(value).addClass("wrongPosition");
@@ -153,6 +182,8 @@ $('#count').click(function(){
     startGame = 1;
     $('#count').text(timerLength+1).removeClass("startButton");
     countdownTimer(timerLength);
+    loadGameBoardHintRow();
+    attempt++;
     loadGameBoardRow();
   }
 })
@@ -169,7 +200,7 @@ $('.keyBtn').click(function(){
         break;
       case '↲':
         if (rowComplete == 1){
-          if (correctLetters.length < 5) {
+          if (hints.length < 5) {
             checkWord();
             attempt ++;
             loadGameBoardRow();

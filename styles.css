@@ -82,8 +82,12 @@ button:active{
 }
 
 /* Checking if letters and words are correct or exist */
-.correct{
-  background-color: #6aaa64;
+.wordDoesntExist {
+  color: red;
+}
+
+.wrong {
+  background-color: #787c7e;
   color: white;
 }
 
@@ -92,11 +96,7 @@ button:active{
   color: white;
 }
 
-.wrong {
-  background-color: #787c7e;
+.correct{
+  background-color: #6aaa64;
   color: white;
-}
-
-.wordDoesntExist {
-  color: red;
 }
