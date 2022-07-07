@@ -1,7 +1,7 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
-const numberOfGuesses = 5;
-const timerLength = 14;
-const secretWord = "HELLO"//wordArray[Math.floor(Math.random()*2315)];
+const numberOfGuesses = 6;
+const timerLength = 29;
+const secretWord = wordArray[Math.floor(Math.random()*2315)];
 
 var hints = [0,1,3];
 var lettersToCheck = [];
@@ -40,19 +40,6 @@ for (i=0; i<3; i++){ // 3 rows
     }
   });
 }
-
-
-// // get the indexs of the letters that are left to check.
-// function lettersLeft() {
-//   let x = [];  // create empty array
-//   for (i=0; i<5; i++){  //loop through indexs 0-4
-//     if (hints.indexOf(i) == -1) { // if index is NOT in correct letters, then add to index
-//         x.push(i);
-//     }
-//   }
-//   return x; // return index of letters left to get
-// }
-
 
 
 function gameOver(){
@@ -123,56 +110,34 @@ function checkRow(){
   for (i=0; i<5; i++){
     currentGuess += currentRow.children().eq(i).html().toUpperCase();
   }
-  if (!wordList.has(currentGuess)) {
+  if (!allowedWordList.has(currentGuess) && !wordList.has(currentGuess)) {
     currentRow.children().addClass("wordDoesntExist");
   }
 }
 
 function checkWord(){
   Array.from(currentGuess).forEach(function(elt, i, guess){
-    currentRow.children().eq(i).addClass("wrong");
     let multiLetter = getAllIndexes(secretWord, elt);
     multiLetter.forEach(function(MLElt, MLi) {
       if (MLElt == i) {
-        currentRow.children().eq(i).removeClass("wrong").removeClass("wrongPosition").addClass("correct");
+        //currentRow.children().eq(i).removeClass("wrongPosition").addClass("correct");
+        currentRow.children().eq(i).addClass("correct");
+        $("button[data-key='"+elt.toLowerCase()+"']").addClass("correct")
+        return;
       }
       else if (secretWord[MLElt] == currentGuess[MLElt]) {
         return;
       }
       else if(multiLetter.length >= getAllIndexes(currentGuess, elt).length) {
-        currentRow.children().eq(i).removeClass("wrong").addClass("wrongPosition");
+        currentRow.children().eq(i).addClass("wrongPosition");
+        $("button[data-key='"+elt.toLowerCase()+"']").addClass("wrongPosition")
+        return;
       }
+
     });
+    currentRow.children().eq(i).addClass("wrong");
+    $("button[data-key='"+elt.toLowerCase()+"']").addClass("wrong")
   });
-}
-
-//check if word is correct on enter
-function checkWordOLD() {
-  lettersToCheck = lettersLeft();  //make coopy of letters left so that we can edit letters left if letter is found
-  lettersToCheck.forEach(function(value,index,array) { //for each letter left eg.[0,3]
-    let letterToCheck = currentRow.children().eq(value).html().toUpperCase(); //letterbox[0].text -what the player has guessed.
-    let instances = getAllIndexes(secretWord, letterToCheck);//get indexes of all instances of guessed letter in the secret word. eg l in hello = [2,3] / p in hello = []
-    if (instances.length == 0) { //is [] then leter is not in secret word
-      currentRow.children().eq(value).addClass("wrong");
-      return;                    //do nothing - go to next guessed letter
-    }
-    else {  //letter exists in secret word
-      instances.some(function(inst) { // for each index of the letter in secret ie l = [2,3]
-        if (!hints.includes(inst)){  // check if [2] is in correct letters- if it is then skip it (helps for doubble letters)
-          if (inst == value){ // if it isn't in correct letters and the index of the instance matches the index of the guest then it is right word right place
-            currentRow.children().eq(value).removeClass("wrongPosition").addClass("correct");
-            hints.push(value);
-            return true;
-          }else {
-            currentRow.children().eq(value).addClass("wrongPosition");
-          // correct letter wrong position
-          console.log("correct letter, wrong position");
-          }
-        }
-      });
-    }
-  });
-
 }
 
 
@@ -200,12 +165,12 @@ $('.keyBtn').click(function(){
         break;
       case '↲':
         if (rowComplete == 1){
-          if (hints.length < 5) {
-            checkWord();
+          checkWord();
+          if (currentGuess == secretWord) {
+              alert("you win");
+          } else {
             attempt ++;
             loadGameBoardRow();
-          }else {
-            console.log("you win");
           }
         }
         break;
