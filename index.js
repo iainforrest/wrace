@@ -1,8 +1,9 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
 const timerLength = 29;
-const secretWord = wordArray[Math.floor(Math.random()*2315)];
 
+var countdown = timerLength;
+var secretWord;
 var hints = [0,1,3];
 var lettersToCheck = [];
 var attempt = 0;
@@ -11,7 +12,7 @@ var nextLetterBox;
 var lastLetterBox =[];
 var currentGuess = "";
 
-var rowComplete = 0;
+var rowComplete;
 
 var startGame = 0;
 var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
@@ -20,13 +21,19 @@ var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
 //create game board rows
-for (i=0; i<numberOfGuesses; i++) {- // 5 rows
-  $('.wordContainer').append(letterBoxRowHTML);  //add row
-  for (j=0; j<5; j++){
-    $('.letterBoxRow').last().append(letterBoxHTML);  // ad 5 boxes to each row
-  }
+function newGameBoard(){
+  $('.wordContainer').html("");
+  for (i=0; i<numberOfGuesses; i++) {- // 5 rows
+    $('.wordContainer').append(letterBoxRowHTML);  //add row
+    for (j=0; j<5; j++){
+      $('.letterBoxRow').last().append(letterBoxHTML);  // ad 5 boxes to each row
+    }
 
+  }
 }
+
+newGameBoard();
+
 
 //create keyboard
 for (i=0; i<3; i++){ // 3 rows
@@ -44,10 +51,11 @@ for (i=0; i<3; i++){ // 3 rows
 
 function gameOver(){
   $("#count").text("Game Over");
+  //$(document).removeEventList
 }
 
 //countdown Timer
-function countdownTimer(countdown) {
+function countdownTimer() {
   var x = setInterval(function() {
     $("#count").text(countdown)
     countdown--;
@@ -140,34 +148,43 @@ function checkWord(){
   });
 }
 
+function newWord () {
+  rowComplete = 0;
+  countdown = timerLength;
+  secretWord = wordArray[Math.floor(Math.random()*2315)];
+  newGameBoard();
+  $(".keyBtn").removeClass("correct").removeClass("wrongPosition").removeClass("wrong");
+  loadGameBoardHintRow();
+  attempt=1;
+  loadGameBoardRow();
+}
+
 
 //start game
 $('#count').click(function(){
   if (startGame == 0) { //start timer if game hasn't started
     startGame = 1;
     $('#count').text(timerLength+1).removeClass("startButton");
-    countdownTimer(timerLength);
-    loadGameBoardHintRow();
-    attempt++;
-    loadGameBoardRow();
+    countdownTimer();
+    newWord();
   }
 })
 
-
-//event listner for keyboard presss then take action
-$('.keyBtn').click(function(){
+function KeyboardPressed(keyPressed){
   if (startGame == 1){ // do nothing if the countdown hasn't startedd
-    let keyPressed = $(this).attr("data-key") //get the key
+      //get the key
     //case statement del, enter, other letter
     switch (keyPressed) {
       case '⌫':
+      case 'Backspace':
         deleteButtonPressed();
         break;
       case '↲':
+      case 'Enter':
         if (rowComplete == 1){
           checkWord();
           if (currentGuess == secretWord) {
-              alert("you win");
+              newWord();
           } else {
             attempt ++;
             loadGameBoardRow();
@@ -186,5 +203,18 @@ $('.keyBtn').click(function(){
 
     }
   }
+}
 
+
+$(document).keydown(function(e){
+  console.log(e.key + " : " +e.keyCode);
+  if ( ((e.keyCode >= 65) && (e.keyCode <=90)) || (e.keyCode == 13) || (e.keyCode == 8)) {
+    KeyboardPressed(e.key);
+  }
+
+});
+
+//event listner for keyboard presss then take action
+$('.keyBtn').click(function(){
+  KeyboardPressed($(this).attr("data-key"));
 });
