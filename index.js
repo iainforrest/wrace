@@ -4,7 +4,7 @@ const timerLength = 49;
 
 var countdown = timerLength;
 var secretWord;
-var hints = [1,3];
+var hints = new Set();
 var lettersToCheck = [];
 var attempt = 0;
 var currentRow;
@@ -68,7 +68,7 @@ function countdownTimer() {
 function loadGameBoardHintRow() {
   currentRow = $('.letterBoxRow').eq(0); // Top row
   for (i=0; i<secretWord.length; i++){
-    if (hints.indexOf(i) != -1) {
+    if (hints.has(i)) {
       currentRow.children().eq(i).addClass("correct").text(secretWord[i]);
     } else {
       currentRow.children().eq(i).addClass("wrong").text("*");
@@ -85,6 +85,14 @@ function loadGameBoardRow() {
   lastLetterBox = []; // clear delete list
   currentRow = $('.letterBoxRow').eq(attempt); // use "attempt" to set up the current row
   nextLetterBox = $('.letterBox:empty').first();
+}
+
+function createHints () {
+  let noOfHints = Math.floor(Math.random()*6);
+  hints.clear();
+  for (i=0; i<noOfHints; i++) {
+    hints.add(Math.floor(Math.random()*5));
+  }
 }
 
 function scoreBoard (){
@@ -159,6 +167,7 @@ function newWord () {
   rowComplete = 0;
   countdown = timerLength;
   secretWord = wordArray[Math.floor(Math.random()*2315)];
+  createHints();
   newGameBoard();
   $(".keyBtn").removeClass("correct").removeClass("wrongPosition").removeClass("wrong");
   loadGameBoardHintRow();
@@ -172,7 +181,6 @@ function gameOver(){
   $('.keyBtn').off("click");
   $(document).off("keydown");
 
-  //$(document).removeEventList
 }
 
 
@@ -195,7 +203,7 @@ function KeyboardPressed(keyPressed){
           } else {
             attempt ++;
             if (attempt == numberOfGuesses) {
-              gameOver();
+              countdown = 0; //trigger game over
             } else {
               loadGameBoardRow();
             }
@@ -220,7 +228,6 @@ function KeyboardPressed(keyPressed){
 function setListeners(){
   //event listner for tap/click on keyboard
   $(document).keydown(function(e){
-    console.log(e.key + " : " +e.keyCode);
     if ( ((e.keyCode >= 65) && (e.keyCode <=90)) || (e.keyCode == 13) || (e.keyCode == 8)) {
       KeyboardPressed(e.key);
     }
