@@ -4,15 +4,16 @@ const timerLength = 29;
 
 var countdown = timerLength;
 var secretWord;
-var hints = [0,1,3];
+var hints = [1,3];
 var lettersToCheck = [];
 var attempt = 0;
 var currentRow;
 var nextLetterBox;
 var lastLetterBox =[];
-var currentGuess = "";
-
+var currentGuess;
 var rowComplete;
+
+var wordsCorrect = 0;
 
 var startGame = 0;
 var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
@@ -32,20 +33,20 @@ function newGameBoard(){
   }
 }
 
-newGameBoard();
-
 
 //create keyboard
-for (i=0; i<3; i++){ // 3 rows
-  $('.keyboard').append(keyboardRowHTML); //append row
-  keyboardLetters[i].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
-    $('.keyboardRow').last().append(buttonKeyHTML); //append button HTML
-    if ((value == '⌫') || (value == '↲') ){ //extra wide button for del and enter
-      $('.keyBtn').last().addClass('col-15').attr("data-key", value).text(value);
-    }else {
-      $('.keyBtn').last().addClass('col-1').attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
-    }
-  });
+function createKeyboard () {
+  for (i=0; i<3; i++){ // 3 rows
+    $('.keyboard').append(keyboardRowHTML); //append row
+    keyboardLetters[i].forEach(function(value, index, array) {  //for each letter in the array of letter arrays
+      $('.keyboardRow').last().append(buttonKeyHTML); //append button HTML
+      if ((value == '⌫') || (value == '↲') ){ //extra wide button for del and enter
+        $('.keyBtn').last().addClass('col-15').attr("data-key", value).text(value);
+      }else {
+        $('.keyBtn').last().addClass('col-1').attr("data-key", value).text(value); //set data-key and inner text to the letter from the array
+      }
+    });
+  }
 }
 
 
@@ -114,7 +115,7 @@ function getAllIndexes(arr, val) {
 
 function checkRow(){
   rowComplete = 1;
-  currentGuess = ""
+  currentGuess = "";
   for (i=0; i<5; i++){
     currentGuess += currentRow.children().eq(i).html().toUpperCase();
   }
@@ -160,16 +161,6 @@ function newWord () {
 }
 
 
-//start game
-$('#count').click(function(){
-  if (startGame == 0) { //start timer if game hasn't started
-    startGame = 1;
-    $('#count').text(timerLength+1).removeClass("startButton");
-    countdownTimer();
-    newWord();
-  }
-})
-
 function KeyboardPressed(keyPressed){
   if (startGame == 1){ // do nothing if the countdown hasn't startedd
       //get the key
@@ -205,16 +196,37 @@ function KeyboardPressed(keyPressed){
   }
 }
 
+function setListeners(){
+  //event listner for tap/click on keyboard
+  $(document).keydown(function(e){
+    console.log(e.key + " : " +e.keyCode);
+    if ( ((e.keyCode >= 65) && (e.keyCode <=90)) || (e.keyCode == 13) || (e.keyCode == 8)) {
+      KeyboardPressed(e.key);
+    }
 
-$(document).keydown(function(e){
-  console.log(e.key + " : " +e.keyCode);
-  if ( ((e.keyCode >= 65) && (e.keyCode <=90)) || (e.keyCode == 13) || (e.keyCode == 8)) {
-    KeyboardPressed(e.key);
-  }
+  });
 
-});
+  //event listner for keyboard presss then take action
+  $('.keyBtn').click(function(){
+    KeyboardPressed($(this).attr("data-key"));
+  });
 
-//event listner for keyboard presss then take action
-$('.keyBtn').click(function(){
-  KeyboardPressed($(this).attr("data-key"));
-});
+  //start game
+  $('#count').click(function(){
+    if (startGame == 0) { //start timer if game hasn't started
+      startGame = 1;
+      $('#count').text(timerLength+1).removeClass("startButton");
+      countdownTimer();
+      newWord();
+    }
+  })
+}
+
+function gameStartSetup(){
+  newGameBoard();
+  createKeyboard();
+  setListeners();
+}
+
+
+gameStartSetup();
