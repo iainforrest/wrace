@@ -10,6 +10,30 @@ button:active{
     box-shadow: 2px 2px #888888;
 }
 
+h1 {
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.header {
+  display:inline-block;
+  width: 100%;
+  position: relative;
+}
+
+
+.scoreBoard {
+  display: inline-block;
+  position: absolute;
+  right: 20px;
+}
+
+table, td {
+    border: 2px solid grey;
+    margin: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+}
 
 /* Title Section and gameboard */
 .startButton {
@@ -18,7 +42,11 @@ button:active{
   width: fit-content;
   padding: 2px 20px;
   cursor: pointer;
-  margin:auto;
+  margin: 0 auto;
+}
+
+#count {
+  margin: 0 auto;
 }
 
 .col-1 {

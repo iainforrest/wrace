@@ -1,6 +1,6 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
-const timerLength = 29;
+const timerLength = 49;
 
 var countdown = timerLength;
 var secretWord;
@@ -31,6 +31,7 @@ function newGameBoard(){
     }
 
   }
+  scoreBoard();
 }
 
 
@@ -49,12 +50,6 @@ function createKeyboard () {
   }
 }
 
-
-function gameOver(){
-  $("#count").text("Game Over");
-  //$(document).removeEventList
-}
-
 //countdown Timer
 function countdownTimer() {
   var x = setInterval(function() {
@@ -66,7 +61,6 @@ function countdownTimer() {
     }
   },1000);
 }
-
 
 
 //Load hints onto the current row
@@ -82,12 +76,21 @@ function loadGameBoardHintRow() {
   nextLetterBox = $('.letterBox:empty').first();
 }
 
+
+
 //Load hints onto the current row
 function loadGameBoardRow() {
   rowComplete = 0; // reset so that enter doesn't work
   lastLetterBox = []; // clear delete list
   currentRow = $('.letterBoxRow').eq(attempt); // use "attempt" to set up the current row
   nextLetterBox = $('.letterBox:empty').first();
+}
+
+function scoreBoard (){
+  let score10 = Math.floor(wordsCorrect/10);
+  let score1 = wordsCorrect%10;
+  $('.score-10').text(score10);
+  $('.score-1').text(score1);
 }
 
 //delete button
@@ -160,6 +163,11 @@ function newWord () {
   loadGameBoardRow();
 }
 
+function gameOver(){
+  $("#count").text("Game Over");
+  //$(document).removeEventList
+}
+
 
 function KeyboardPressed(keyPressed){
   if (startGame == 1){ // do nothing if the countdown hasn't startedd
@@ -175,6 +183,7 @@ function KeyboardPressed(keyPressed){
         if (rowComplete == 1){
           checkWord();
           if (currentGuess == secretWord) {
+              wordsCorrect++;
               newWord();
           } else {
             attempt ++;
