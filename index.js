@@ -11,6 +11,7 @@ var currentRow;
 var nextLetterBox;
 var lastLetterBox =[];
 var currentGuess;
+var isWord = false;
 var rowComplete;
 
 var wordsCorrect = 0;
@@ -122,7 +123,8 @@ function checkRow(){
   for (i=0; i<5; i++){
     currentGuess += currentRow.children().eq(i).html().toUpperCase();
   }
-  if (!allowedWordList.has(currentGuess) && !wordList.has(currentGuess)) {
+  isWord = (allowedWordList.has(currentGuess) || wordList.has(currentGuess));
+  if (!isWord) {
     currentRow.children().addClass("wordDoesntExist");
   }
 }
@@ -153,6 +155,7 @@ function checkWord(){
 }
 
 function newWord () {
+  isWord = false;
   rowComplete = 0;
   countdown = timerLength;
   secretWord = wordArray[Math.floor(Math.random()*2315)];
@@ -165,6 +168,10 @@ function newWord () {
 
 function gameOver(){
   $("#count").text("Game Over");
+  alert("Sorry, you loose. Your score is " + wordsCorrect + ". Well Done. The Final word was : " +secretWord );
+  $('.keyBtn').off("click");
+  $(document).off("keydown");
+
   //$(document).removeEventList
 }
 
@@ -180,14 +187,19 @@ function KeyboardPressed(keyPressed){
         break;
       case '↲':
       case 'Enter':
-        if (rowComplete == 1){
+        if (rowComplete == 1 && isWord){
           checkWord();
           if (currentGuess == secretWord) {
               wordsCorrect++;
               newWord();
           } else {
             attempt ++;
-            loadGameBoardRow();
+            if (attempt == numberOfGuesses) {
+              gameOver();
+            } else {
+              loadGameBoardRow();
+            }
+
           }
         }
         break;
