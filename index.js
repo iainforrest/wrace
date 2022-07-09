@@ -1,12 +1,15 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
-const timerLength = 49;
+const timerLength = 50;
+const noOfWords = 10;
+const lengthOfWordsArray = wordArray.length;
 
 const modalStart = document.getElementById("startModal");
 const modalGameOver = document.getElementById("gameOver");
 const modalBtn = $("#modalCloseBtn");
 
-var countdown = timerLength;
+var countdown = timerLength-1;
+var secretWordList = [];
 var secretWord;
 var hints = new Set();
 var lettersToCheck = [];
@@ -17,6 +20,9 @@ var lastLetterBox =[];
 var currentGuess;
 var isWord = false;
 var rowComplete;
+var startTime, endTime;
+
+var x;
 
 var wordsCorrect = 0;
 
@@ -25,6 +31,20 @@ var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
 var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
+
+
+// Make Secret words arrays
+function createSecretWordsArray(){
+  let newWord = wordArray[Math.floor(Math.random()*lengthOfWordsArray)];
+  for (i=0; i<noOfWords; i++){
+    while (secretWordList.includes(newWord)) {
+      newWord = wordArray[Math.floor(Math.random()*lengthOfWordsArray)];
+    }
+
+    secretWordList.push(newWord);
+  }
+}
+
 
 //create game board rows
 function newGameBoard(){
@@ -57,12 +77,13 @@ function createKeyboard () {
 
 //countdown Timer
 function countdownTimer() {
-  var x = setInterval(function() {
+  startTime = performance.now();
+  x = setInterval(function() {
     $("#count").text(countdown)
     countdown--;
     if (countdown == -1) {
       gameOver();
-      clearInterval(x);
+
     }
   },1000);
 }
@@ -92,7 +113,7 @@ function loadGameBoardRow() {
 }
 
 function createHints () {
-  let noOfHints = Math.floor(Math.random()*6);
+  let noOfHints = Math.floor(Math.random()*5);
   hints.clear();
   for (i=0; i<noOfHints; i++) {
     hints.add(Math.floor(Math.random()*5));
@@ -169,23 +190,38 @@ function checkWord(){
 function newWord () {
   isWord = false;
   rowComplete = 0;
-  countdown = timerLength;
-  secretWord = wordArray[Math.floor(Math.random()*2315)];
+  countdown = timerLength-1;
+  secretWord = secretWordList[wordsCorrect];
   createHints();
   newGameBoard();
-  $(".keyBtn").removeClass("correct").removeClass("wrongPosition").removeClass("wrong");
+  //$(".keyBtn").removeClass("correct").removeClass("wrongPosition").removeClass("wrong");
+  $(".keyBtn").removeClass("correct wrongPosition wrong");
   loadGameBoardHintRow();
   attempt=1;
   loadGameBoardRow();
 }
 
+function getScore() {
+  let score = timerLength;
+  score += (wordsCorrect*100);
+  score -= endTime;
+  return score;
+}
+
 function gameOver(){
+  clearInterval(x);
+  endTime = Math.floor((performance.now()-startTime)/1000);
+  $('.keyBtn').off("click");
+  $(document).off("keydown");
   $("#count").text("00");
-  $("#gameOver").append("<p>Sorry, you loose. Your score is " + wordsCorrect + ". Well Done.</p><p> The Final word was : " +secretWord +"</p>");
+
+  if (wordsCorrect >= noOfWords){
+    $("#gameOver").append("<p>CONGRATULATIONS, YOU WIN.</p>");
+  } else {
+    $("#gameOver").append("<p>Sorry, you loose. The Final word was : " +secretWord +"</p>");
+  }
+   $("#gameOver").append("<p>Your score is " + getScore() + ". Well Done.</p>" );
   modalGameOver.showModal();
-  // alert("Sorry, you loose. Your score is " + wordsCorrect + ". Well Done. The Final word was : " +secretWord );
-  // $('.keyBtn').off("click");
-  // $(document).off("keydown");
 
 }
 
@@ -205,7 +241,11 @@ function KeyboardPressed(keyPressed){
           checkWord();
           if (currentGuess == secretWord) {
               wordsCorrect++;
-              newWord();
+              if (wordsCorrect >= noOfWords){
+                gameOver();
+              }else {
+                newWord();
+              }
           } else {
             attempt ++;
             if (attempt == numberOfGuesses) {
@@ -235,7 +275,7 @@ function startCountdown(){
   if (startGame == 0) { //start timer if game hasn't started
     modalStart.close();
     startGame = 1;
-    $('#count').text(timerLength+1);
+    $('#count').text(timerLength);
     countdownTimer();
     newWord();
   }
@@ -274,6 +314,7 @@ function setListeners(){
 }
 
 function gameStartSetup(){
+  createSecretWordsArray();
   newGameBoard();
   createKeyboard();
   setListeners();
