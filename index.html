@@ -3,10 +3,13 @@
   <head>
     <meta charset="utf-8">
     <title>Wrace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+
     <div class="header">
+      <div id="count" class="countdown"></div>
       <h1 class="header-h1">WRACE</h1>
       <table class="scoreBoard">
         <tr>
@@ -17,8 +20,18 @@
 
     </div>
 
+    <dialog id="startModal">
+      <p>Welcome to Wrace.</p>
+      <p>The word racing game inspired by Wordle</p>
+      <p>Battle the clock and see how far you can get.
+      Everyone gets the same words every day, so race your friends and see who wins.</p>
+      <button id="modalCloseBtn" type="button">Click Here to Start</button>
+    </dialog>
 
-    <h2 id="count" class="startButton">Click Here To Start...</h2>
+    <dialog id="gameOver">
+      <p>This is the Game Over Modal</p>
+    </dialog>
+
 
     <div class="wordContainer">
 
@@ -30,6 +43,7 @@
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="assets/words.js" charset="utf-8"></script>
     <script type="text/javascript" src="index.js" charset="utf-8"></script>
   </body>

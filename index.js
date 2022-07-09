@@ -2,6 +2,10 @@ const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d',
 const numberOfGuesses = 6;
 const timerLength = 49;
 
+const modalStart = document.getElementById("startModal");
+const modalGameOver = document.getElementById("gameOver");
+const modalBtn = $("#modalCloseBtn");
+
 var countdown = timerLength;
 var secretWord;
 var hints = new Set();
@@ -176,10 +180,12 @@ function newWord () {
 }
 
 function gameOver(){
-  $("#count").text("Game Over");
-  alert("Sorry, you loose. Your score is " + wordsCorrect + ". Well Done. The Final word was : " +secretWord );
-  $('.keyBtn').off("click");
-  $(document).off("keydown");
+  $("#count").text("00");
+  $("#gameOver").append("<p>Sorry, you loose. Your score is " + wordsCorrect + ". Well Done.</p><p> The Final word was : " +secretWord +"</p>");
+  modalGameOver.showModal();
+  // alert("Sorry, you loose. Your score is " + wordsCorrect + ". Well Done. The Final word was : " +secretWord );
+  // $('.keyBtn').off("click");
+  // $(document).off("keydown");
 
 }
 
@@ -225,6 +231,29 @@ function KeyboardPressed(keyPressed){
   }
 }
 
+function startCountdown(){
+  if (startGame == 0) { //start timer if game hasn't started
+    modalStart.close();
+    startGame = 1;
+    $('#count').text(timerLength+1);
+    countdownTimer();
+    newWord();
+  }
+}
+
+function openingToastr(){
+  toastr.info(
+  'Click HERE to start...',
+  'Ready to Play?',
+  {
+    showDuration: 500,
+    hideDuration: 500,
+    positionClass: "toast-top-center",
+    onHidden: startCountdown
+  }
+);
+}
+
 function setListeners(){
   //event listner for tap/click on keyboard
   $(document).keydown(function(e){
@@ -234,26 +263,21 @@ function setListeners(){
 
   });
 
+  //modal close and game start button
+  modalBtn.click(startCountdown);
+
   //event listner for keyboard presss then take action
   $('.keyBtn').click(function(){
     KeyboardPressed($(this).attr("data-key"));
   });
 
-  //start game
-  $('#count').click(function(){
-    if (startGame == 0) { //start timer if game hasn't started
-      startGame = 1;
-      $('#count').text(timerLength+1).removeClass("startButton");
-      countdownTimer();
-      newWord();
-    }
-  })
 }
 
 function gameStartSetup(){
   newGameBoard();
   createKeyboard();
   setListeners();
+  modalStart.showModal();
 }
 
 
