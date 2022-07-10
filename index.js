@@ -1,6 +1,6 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
-const timerLength = 50;
+const timerLength = 90;
 const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
 
@@ -23,6 +23,7 @@ var rowComplete;
 var startTime, endTime;
 
 var x;
+var mT = new MersenneTwister(100);
 
 var wordsCorrect = 0;
 
@@ -218,7 +219,7 @@ function gameOver(){
   if (wordsCorrect >= noOfWords){
     $("#gameOver").append("<p>CONGRATULATIONS, YOU WIN.</p>");
   } else {
-    $("#gameOver").append("<p>Sorry, you loose. The Final word was : " +secretWord +"</p>");
+    $("#gameOver").append("<p>Sorry, you lose. The Final word was : " +secretWord +"</p>");
   }
    $("#gameOver").append("<p>Your score is " + getScore() + ". Well Done.</p>" );
   modalGameOver.showModal();
@@ -323,3 +324,4 @@ function gameStartSetup(){
 
 
 gameStartSetup();
+console.log(secretWordList);
