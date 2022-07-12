@@ -1,8 +1,10 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
-const timerLength = 90;
+const timerLength = 60;
 const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
+const seedValue = Math.floor((new Date() - new Date(2022,06,11))/86400000);
+const noOfHints = [4,3,3,3,2,2,2,1,1,0];
 
 const modalStart = document.getElementById("startModal");
 const modalGameOver = document.getElementById("gameOver");
@@ -11,8 +13,7 @@ const modalBtn = $("#modalCloseBtn");
 var countdown = timerLength-1;
 var secretWordList = [];
 var secretWord;
-var hints = new Set();
-var lettersToCheck = [];
+var hints = [];
 var attempt = 0;
 var currentRow;
 var nextLetterBox;
@@ -21,9 +22,11 @@ var currentGuess;
 var isWord = false;
 var rowComplete;
 var startTime, endTime;
+var currentScore, highScore;
 
-var x;
-var mT = new MersenneTwister(100);
+var xCountdown;
+var mT = new MersenneTwister(seedValue);
+const randoArray = Array.from({length: (noOfWords*2)}, i => mT.random());
 
 var wordsCorrect = 0;
 
@@ -36,10 +39,11 @@ var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
 // Make Secret words arrays
 function createSecretWordsArray(){
-  let newWord = wordArray[Math.floor(Math.random()*lengthOfWordsArray)];
+
   for (i=0; i<noOfWords; i++){
+    let newWord = wordArray[Math.floor(randoArray[i]*lengthOfWordsArray)];
     while (secretWordList.includes(newWord)) {
-      newWord = wordArray[Math.floor(Math.random()*lengthOfWordsArray)];
+      newWord = wordArray[Math.floor(randoArray[i]*lengthOfWordsArray)];
     }
 
     secretWordList.push(newWord);
@@ -79,7 +83,7 @@ function createKeyboard () {
 //countdown Timer
 function countdownTimer() {
   startTime = performance.now();
-  x = setInterval(function() {
+  xCountdown = setInterval(function() {
     $("#count").text(countdown)
     countdown--;
     if (countdown == -1) {
@@ -94,7 +98,7 @@ function countdownTimer() {
 function loadGameBoardHintRow() {
   currentRow = $('.letterBoxRow').eq(0); // Top row
   for (i=0; i<secretWord.length; i++){
-    if (hints.has(i)) {
+    if (hints.includes(i)) {
       currentRow.children().eq(i).addClass("correct").text(secretWord[i]);
     } else {
       currentRow.children().eq(i).addClass("wrong").text("*");
@@ -114,10 +118,13 @@ function loadGameBoardRow() {
 }
 
 function createHints () {
-  let noOfHints = Math.floor(Math.random()*5);
-  hints.clear();
-  for (i=0; i<noOfHints; i++) {
-    hints.add(Math.floor(Math.random()*5));
+  hints=[];
+  for (i=0; i<noOfHints[wordsCorrect]; i++) {
+    let hintToAdd = Math.floor(mT.random()*5);
+    while (hints.includes(hintToAdd)) {
+      hintToAdd = Math.floor(mT.random()*5);
+    }
+    hints.push(hintToAdd);
   }
 }
 
@@ -195,7 +202,6 @@ function newWord () {
   secretWord = secretWordList[wordsCorrect];
   createHints();
   newGameBoard();
-  //$(".keyBtn").removeClass("correct").removeClass("wrongPosition").removeClass("wrong");
   $(".keyBtn").removeClass("correct wrongPosition wrong");
   loadGameBoardHintRow();
   attempt=1;
@@ -203,25 +209,40 @@ function newWord () {
 }
 
 function getScore() {
-  let score = timerLength;
-  score += (wordsCorrect*100);
-  score -= endTime;
-  return score;
+  currentScore = timerLength;
+  currentScore += (wordsCorrect*100);
+  currentScore -= endTime;
+  return currentScore;
+}
+
+function checkHighScore (){
+  if (!localStorage.highScore) {
+    highScore = currentScore
+  }else {
+    highScore = localStorage.highScore
+  }
+  if (currentScore > highScore) {highScore = currentScore}
+  localStorage.highScore = highScore;
+
 }
 
 function gameOver(){
-  clearInterval(x);
+  clearInterval(xCountdown);
   endTime = Math.floor((performance.now()-startTime)/1000);
   $('.keyBtn').off("click");
   $(document).off("keydown");
   $("#count").text("00");
+
+  getScore();
+  checkHighScore();
 
   if (wordsCorrect >= noOfWords){
     $("#gameOver").append("<p>CONGRATULATIONS, YOU WIN.</p>");
   } else {
     $("#gameOver").append("<p>Sorry, you lose. The Final word was : " +secretWord +"</p>");
   }
-   $("#gameOver").append("<p>Your score is " + getScore() + ". Well Done.</p>" );
+   $("#gameOver").append("<p>Your score is " +currentScore + ". Well Done.</p>" );
+   $("#gameOver").append("<p>Your High Score is " + highScore + ". Well Done.</p>" );
   modalGameOver.showModal();
 
 }
@@ -324,4 +345,4 @@ function gameStartSetup(){
 
 
 gameStartSetup();
-console.log(secretWordList);
+//console.log(secretWordList);
