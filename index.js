@@ -5,6 +5,7 @@ const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
 const seedValue = Math.floor((new Date() - new Date(2022,06,11))/86400000);
 const noOfHints = [4,3,3,3,2,2,2,1,1,0];
+const scoreEmojis = ["😢 Better luck next time.</p>","🙂 Well Done.</p>","😁 You're AWESOME!</p>"];
 
 const modalStart = document.getElementById("startModal");
 const modalGameOver = document.getElementById("gameOver");
@@ -35,6 +36,7 @@ var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
 var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
+
 
 
 // Make Secret words arrays
@@ -241,8 +243,12 @@ function gameOver(){
   } else {
     $("#gameOver").append("<p>Sorry, you lose. The Final word was : " +secretWord +"</p>");
   }
-   $("#gameOver").append("<p>Your score is " +currentScore + ". Well Done.</p>" );
-   $("#gameOver").append("<p>Your High Score is " + highScore + ". Well Done.</p>" );
+   $("#gameOver").append("<p>Your score today is " +currentScore + ". " );
+   if (currentScore < 100) {$("#gameOver").append(scoreEmojis[0]);}
+   else if (currentScore >=100 && currentScore < 700) {$("#gameOver").append(scoreEmojis[1]);}
+   if (currentScore >=700) {$("#gameOver").append(scoreEmojis[2]);}
+
+   $("#gameOver").append("<p>Your all time High Score is " + highScore + ".</p>" );
   modalGameOver.showModal();
 
 }
@@ -291,6 +297,13 @@ function KeyboardPressed(keyPressed){
 
     }
   }
+}
+
+function playedToday (){
+  if (!localStorage.playedToday){
+    //check if seed values match
+  }
+  localStorage.playedToday = seedValue;
 }
 
 function startCountdown(){
