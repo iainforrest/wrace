@@ -5,13 +5,16 @@
     <meta name=viewport content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Wrace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Emoji&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
 
     <div class="header">
       <div id="count" class="countdown"></div>
-      <h1 class="header-h1">WRACE</h1>
+      <h1 class="header-h1"><span class="btnPlayPause">⏯️</span> WRACE</h1>
       <table class="scoreBoard">
         <tr>
           <td class="score-10">0</td>
@@ -22,16 +25,28 @@
     </div>
 
     <dialog id="startModal">
-      <p>Welcome to Wrace.</p>
-      <p>The word racing game inspired by Wordle</p>
-      <p>Battle the clock and see how far you can get.
-      Everyone gets the same words every day, so race your friends and see who wins.</p>
-      <button id="modalCloseBtn" class="startButton" type="button">Start Now</button>
+      <div class="modalPadding">
+        <p>Welcome to Wrace.</p>
+        <p>The word racing game inspired by Wordle</p>
+        <p>Battle the clock and see how far you can get.
+        Everyone gets the same words every day, so race your friends and see who wins.</p>
+        <button id="modalCloseBtn" class="startButton" type="button">Start Now</button>
+      </div>
     </dialog>
 
-    <dialog id="gameOver">
+    <dialog id="gameOverModal">
+      <div class="modalPadding" id="gameOver">
+
+      </div>
     </dialog>
 
+    <dialog id="pauseModal">
+      <div class="modalPadding">
+        <p>You have just paused Wrace</p>
+        <p>The clock has stopped and you can come back any time today</p>
+        <button id="modalResumeBtn" class="startButton" type="button">Resume Game</button>
+      </div>
+    </dialog>
 
     <div class="wordContainer">
 

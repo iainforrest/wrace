@@ -8,8 +8,10 @@ const noOfHints = [4,3,3,3,2,2,2,1,1,0];
 const scoreEmojis = ["😢 Better luck next time.</p>","🙂 Well Done.</p>","😁 You're AWESOME!</p>"];
 
 const modalStart = document.getElementById("startModal");
-const modalGameOver = document.getElementById("gameOver");
+const modalGameOver = document.getElementById("gameOverModal");
+const modalPause = document.getElementById("pauseModal");
 const modalBtn = $("#modalCloseBtn");
+const modalResumeBtn = $("#modalResumeBtn");
 
 var countdown = timerLength-1;
 var secretWordList = [];
@@ -24,6 +26,7 @@ var isWord = false;
 var rowComplete;
 var startTime, endTime;
 var currentScore, highScore;
+var isPaused = false;
 
 var xCountdown;
 var mT = new MersenneTwister(seedValue);
@@ -86,12 +89,15 @@ function createKeyboard () {
 function countdownTimer() {
   startTime = performance.now();
   xCountdown = setInterval(function() {
-    $("#count").text(countdown)
-    countdown--;
-    if (countdown == -1) {
-      gameOver();
+    if (!isPaused){
+      $("#count").text(countdown)
+      countdown--;
+      if (countdown == -1) {
+        gameOver();
 
+      }
     }
+
   },1000);
 }
 
@@ -311,6 +317,7 @@ function startCountdown(){
     modalStart.close();
     startGame = 1;
     $('#count').text(timerLength);
+    $(".btnPlayPause").show();
     countdownTimer();
     newWord();
   }
@@ -338,8 +345,18 @@ function setListeners(){
 
   });
 
+  $(".btnPlayPause").click(function(){
+    isPaused=true;
+    modalPause.showModal();
+  });
+
   //modal close and game start button
   modalBtn.click(startCountdown);
+
+  modalResumeBtn.click(function(){
+    modalPause.close();
+    isPaused=false;
+  })
 
   //event listner for keyboard presss then take action
   $('.keyBtn').click(function(){

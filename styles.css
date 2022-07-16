@@ -14,8 +14,9 @@ dialog {
   max-width: 500px;
   border-radius: 2rem;
   border: none;
-  width: device-width;
+  width: 94vw;
   margin: auto 3vw;
+  padding: 0;
 }
 
 h1 {
@@ -24,11 +25,11 @@ h1 {
   margin: 2.5vh;
 }
 
-.header {
-  display:inline-block;
-  width: 100%;
-  position: relative;
-  height: 8vh;
+/* Title Section and gameboard */
+
+.btnPlayPause {
+  display: none;
+  font-family: 'Noto Emoji', sans-serif;
 }
 
 .countdown {
@@ -38,6 +39,13 @@ h1 {
   margin: 2.5vh auto;
   font-size: 5vh;
   font-weight: bold;
+}
+
+.header {
+  display:inline-block;
+  width: 100%;
+  position: relative;
+  height: 8vh;
 }
 
 .scoreBoard {
@@ -54,7 +62,12 @@ table, td {
     font-weight: bold;
 }
 
-/* Title Section and gameboard */
+/* Modals */
+
+.modalPadding {
+  margin: 5vw;
+}
+
 .startButton {
   border-radius: 2rem;
   background-color: #6aaa64;
@@ -66,8 +79,7 @@ table, td {
   margin: 0 auto;
 }
 
-
-
+/* GameBoard */
 .col-1 {
   width: 8.5%;
 }
@@ -94,31 +106,6 @@ table, td {
   text-transform: uppercase;
   justify-content: center;
   align-items: center;
-}
-
-.keyboard {
-  max-width: 500px;
-  margin: auto;
-  text-align: center;
-}
-
-.keyboardRow {
-  margin: 5px auto;
-  text-align: center;
-  height: 8vh;
-}
-
-.keyBtn {
-  background-color: #d3d6da;
-  border: 0px solid;
-  border-radius: 0.25em;
-  cursor: pointer;
-  height: 7vh;
-  margin: 2px;
-  padding: 0;
-  font-size: 3.5vh;
-  line-height: 3.5vh;
-  text-transform: uppercase;
 }
 
 .wordContainer{
@@ -148,6 +135,34 @@ table, td {
   background-color: #6aaa64;
   color: white;
 }
+
+/* KeyBoard */
+
+.keyboard {
+  max-width: 500px;
+  margin: auto;
+  text-align: center;
+}
+
+.keyboardRow {
+  margin: 5px auto;
+  text-align: center;
+  height: 8vh;
+}
+
+.keyBtn {
+  background-color: #d3d6da;
+  border: 0px solid;
+  border-radius: 0.25em;
+  cursor: pointer;
+  height: 7vh;
+  margin: 2px;
+  padding: 0;
+  font-size: 3.5vh;
+  line-height: 3.5vh;
+  text-transform: uppercase;
+}
+
 
 
 
