@@ -35,7 +35,7 @@ h1 {
 .countdown {
   display: inline-block;
   position: absolute;
-  left: 5vw;
+  left: 5%;
   margin: 2.5vh auto;
   font-size: 5vh;
   font-weight: bold;
@@ -51,7 +51,7 @@ h1 {
 .scoreBoard {
   display: inline-block;
   position: absolute;
-  right: 5vw;
+  right: 5%;
 
 }
 
