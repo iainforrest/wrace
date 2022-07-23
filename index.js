@@ -1,9 +1,9 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
-const timerLength = 5;
+const timerLength = 60;
 const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
-const seedValue = Math.floor((new Date() - new Date(2022,06,11))/86400000);
+const seedValue = Math.floor((new Date() - new Date(2022,06,10))/86400000);
 const noOfHints = [4,3,3,3,2,2,2,1,1,0];
 const scoreEmojis = ["😢 Better luck next time.</p>","🙂 Well Done.</p>","😁 You're AWESOME!</p>"];
 
@@ -41,6 +41,19 @@ var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
+var currentState;
+if (localStorage.currentState){
+  currentState = JSON.parse(localStorage.getItem("currentState")); // TODO:  needs to be parsed
+}else {
+  currentState = {
+    gameState: "gameOver",
+    todaySeed: seedValue,
+    guessesOnCurrentWord:['TESTE'],
+    wordsCorrect: wordsCorrect,
+    timeSpent:pauseTime
+
+  }
+}
 
 
 // Make Secret words arrays
@@ -118,7 +131,7 @@ function loadGameBoardHintRow() {
 
 
 
-//Load hints onto the current row
+//setup to work on the next row
 function loadGameBoardRow() {
   rowComplete = 0; // reset so that enter doesn't work
   lastLetterBox = []; // clear delete list
@@ -210,6 +223,21 @@ function checkWord(){
   });
 }
 
+//This section is for if page is loading from a saved/paused state
+function loadGuessesFromPreviousState() {
+  currentState.guessesOnCurrentWord.forEach(function(guess){ //loop through any guesses saved in current state. If none then nothing happens
+    Array.from(guess).forEach(function(letter,i){  //convert String:guess into array and iterate over
+      currentRow.children().eq(i).text(letter);  // ad letter to box on row
+    });
+
+    currentGuess = guess;
+    checkWord(); //run checkword to show correct colours etc`
+    attempt ++; //increase attempts
+    loadGameBoardRow(); // load next rows
+    //repeat with next word in the guesses array. or revert to normal game play
+  });
+}
+
 function newWord () {
   isWord = false;
   rowComplete = 0;
@@ -285,9 +313,11 @@ function KeyboardPressed(keyPressed){
               if (wordsCorrect >= noOfWords){
                 gameOver();
               }else {
+                currentState.guessesOnCurrentWord =[]; //remove gueses from current state
                 newWord();
               }
           } else {
+            currentState.guessesOnCurrentWord.push(currentGuess);
             attempt ++;
             if (attempt == numberOfGuesses) {
               countdown = 0; //trigger game over
@@ -327,6 +357,7 @@ function startCountdown(){
     $(".btnPlayPause").show();
     countdownTimer();
     newWord();
+    if (currentState.guessesOnCurrentWord.length != 0){loadGuessesFromPreviousState()}
   }
 }
 
