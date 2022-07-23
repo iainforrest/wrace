@@ -1,6 +1,6 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
-const timerLength = 60;
+const timerLength = 5;
 const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
 const seedValue = Math.floor((new Date() - new Date(2022,06,11))/86400000);
@@ -27,6 +27,7 @@ var rowComplete;
 var startTime, endTime;
 var currentScore, highScore;
 var isPaused = false;
+var pauseTime = 0;
 
 var xCountdown;
 var mT = new MersenneTwister(seedValue);
@@ -169,7 +170,7 @@ function getAllIndexes(arr, val) {
 function checkRow(){
   rowComplete = 1;
   currentGuess = "";
-  for (i=0; i<5; i++){
+  for (i=0; i<5; i++){  //loop through boxes on the row and build out "currentGuess"
     currentGuess += currentRow.children().eq(i).html().toUpperCase();
   }
   isWord = (allowedWordList.has(currentGuess) || wordList.has(currentGuess));
@@ -179,25 +180,31 @@ function checkRow(){
 }
 
 function checkWord(){
-  Array.from(currentGuess).forEach(function(elt, i, guess){
-    let multiLetter = getAllIndexes(secretWord, elt);
-    multiLetter.forEach(function(MLElt, MLi) {
-      if (MLElt == i) {
-        //currentRow.children().eq(i).removeClass("wrongPosition").addClass("correct");
+  Array.from(currentGuess).forEach(function(elt, i, guess){  //turn currentGuess string into an array and loop through each item eg "hello" = [h,e,l,l,o]
+    let multiLetter = getAllIndexes(secretWord, elt); //check if the letter is in secretWord if it is, it will return an array of indexes eg. l in hello returns [2,3]
+    multiLetter.forEach(function(MLElt, MLi) { //loop through array of indexes, if letter doesn't exist in secretWord, then list will be 0 length
+      //MLElt is the index of the letter in the secret word eg 2
+      //MLi is the position of the index of the letter in the arrary eg 0
+      if (MLElt == i) { // eg does 2 = i (the current position we are in the guess word)
+          //eg guess "lemon", secret = "hello"
+          //MELt would be [2,3], i = 0 correct letter, wrong place
+          //eg guess "yelow", secret = "hello"
+          //MELt would be [2], i = 2 - correct letter, correct place
         currentRow.children().eq(i).addClass("correct");
         $("button[data-key='"+elt.toLowerCase()+"']").addClass("correct")
         return;
       }
-      else if (secretWord[MLElt] == currentGuess[MLElt]) {
+      else if (secretWord[MLElt] == currentGuess[MLElt]) { //for when you guess a double letter but there is only 1
         return;
       }
-      else if(multiLetter.length >= getAllIndexes(currentGuess, elt).length) {
+      else if(multiLetter.length >= getAllIndexes(currentGuess, elt).length) { //makes sure letter doesn't exist more times
         currentRow.children().eq(i).addClass("wrongPosition");
         $("button[data-key='"+elt.toLowerCase()+"']").addClass("wrongPosition")
         return;
       }
 
     });
+    //if length multiLetter = 0 then it is wrong.
     currentRow.children().eq(i).addClass("wrong");
     $("button[data-key='"+elt.toLowerCase()+"']").addClass("wrong")
   });
@@ -236,7 +243,7 @@ function checkHighScore (){
 
 function gameOver(){
   clearInterval(xCountdown);
-  endTime = Math.floor((performance.now()-startTime)/1000);
+  endTime = Math.floor((performance.now()-startTime)/1000) - pauseTime;
   $('.keyBtn').off("click");
   $(document).off("keydown");
   $("#count").text("00");
@@ -323,17 +330,33 @@ function startCountdown(){
   }
 }
 
-function openingToastr(){
-  toastr.info(
-  'Click HERE to start...',
-  'Ready to Play?',
-  {
-    showDuration: 500,
-    hideDuration: 500,
-    positionClass: "toast-top-center",
-    onHidden: startCountdown
+// function openingToastr(){
+//   toastr.info(
+//   'Click HERE to start...',
+//   'Ready to Play?',
+//   {
+//     showDuration: 500,
+//     hideDuration: 500,
+//     positionClass: "toast-top-center",
+//     onHidden: startCountdown
+//   }
+// );
+// }
+
+function gamePaused (event) {
+  if (event.data.state == "pause"){
+    localStorage.setItem("isPaused", "true");
+    isPaused=true;
+    localStorage.setItem("pauseStart", Math.round((Date.now()/1000)));
+    modalPause.showModal();
   }
-);
+  else if (event.data.state == "unpause"){
+    modalPause.close();
+
+    pauseTime += Math.round((Date.now()/1000)) - parseInt(localStorage.getItem("pauseStart"));
+    isPaused=false;
+    localStorage.setItem("isPaused", "false");
+  }
 }
 
 function setListeners(){
@@ -345,18 +368,14 @@ function setListeners(){
 
   });
 
-  $(".btnPlayPause").click(function(){
-    isPaused=true;
-    modalPause.showModal();
-  });
 
   //modal close and game start button
   modalBtn.click(startCountdown);
 
-  modalResumeBtn.click(function(){
-    modalPause.close();
-    isPaused=false;
-  })
+  //pause and unpause
+  $(".btnPlayPause").click({state: "pause"}, gamePaused);
+
+  modalResumeBtn.click({state: "unpause"}, gamePaused);
 
   //event listner for keyboard presss then take action
   $('.keyBtn').click(function(){

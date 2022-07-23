@@ -116,25 +116,7 @@ table, td {
 
 }
 
-/* Checking if letters and words are correct or exist */
-.wordDoesntExist {
-  color: red;
-}
 
-.wrong {
-  background-color: #787c7e;
-  color: white;
-}
-
-.wrongPosition {
-  background-color: #c9b458;
-  color: white;
-}
-
-.correct{
-  background-color: #6aaa64;
-  color: white;
-}
 
 /* KeyBoard */
 
@@ -163,7 +145,25 @@ table, td {
   text-transform: uppercase;
 }
 
+/* Checking if letters and words are correct or exist */
+.wordDoesntExist {
+  color: red;
+}
 
+.wrong {
+  background-color: #787c7e;
+  color: white;
+}
+
+.wrongPosition {
+  background-color: #c9b458;
+  color: white;
+}
+
+.correct{
+  background-color: #6aaa64;
+  color: white;
+}
 
 
 @media screen and (min-width: 480px) {
