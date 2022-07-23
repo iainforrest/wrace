@@ -1,6 +1,6 @@
 const keyboardLetters = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⌫','z','x','c','v','b','n','m','↲']]
 const numberOfGuesses = 6;
-const timerLength = 5;
+const timerLength = 60;
 const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
 const seedValue = Math.floor((new Date() - new Date(2022,06,11))/86400000);
