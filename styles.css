@@ -28,7 +28,6 @@ h1 {
 /* Title Section and gameboard */
 
 .btnPlayPause {
-  display: none;
   font-family: 'Noto Emoji', sans-serif;
 }
 
@@ -59,12 +58,70 @@ table, td {
     border: 2px solid grey;
     margin: calc(2.5vh - 8px) auto;
     font-size: 5vh;
+    line-height: 4vh;
     font-weight: bold;
 }
 
 /* Modals */
 
+.modal {
+  position: absolute;
+  /* top: 40px; left: 3vw; */
+
+  max-width: 500px;
+
+  border: none;
+  width: 94vw;
+  height: 92vh;
+  padding: 0;
+
+}
+
+.mainModal {
+  background-color: #ffffff;
+  box-shadow: 0 4px 4px 0px rgb(0 0 0 / 20%), 6px 0 20px 0 rgb(0 0 0 / 19%);
+  height: 87vh;
+  border-top: none;
+  margin-top: 5vh;
+  border: 1px solid black;
+  border-bottom: none;
+}
+
+.modalTab {
+  border-top-left-radius: 2rem;
+  border-top-right-radius: 2rem;
+  background-color: #ffffff;
+  position: absolute;
+  width: 49.5%;
+  height: 5vh;
+
+  border: 1px solid black;
+  border-bottom: none;
+}
+
+.left{
+  left:0px;
+}
+
+.right {
+  right:0px;
+}
+
+.slide{
+  bottom:-92vh !important;
+}
+
+#dailyTab {
+  border-bottom: 1px solid white;
+}
+
+#practiceTab {
+  border-bottom: 1px solid black;
+
+}
+
 .modalPadding {
+  background-color: #ffffff;
   margin: 5vw;
 }
 

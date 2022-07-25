@@ -37,24 +37,28 @@ var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
 var keyboardRowHTML = '<div class="keyboardRow"></div>';
 var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
-var currentState;
-if (localStorage.currentState && localStorage.pausedSeed == seedValue){
-  currentState = JSON.parse(localStorage.getItem("currentState")); // TODO:  needs to be parsed
-}else {
-  currentState = {
-    gameState: paused,
-    todaySeed: seedValue,
-    guessesOnCurrentWord:['TAROT','IRATE'],
-    wordsCorrect: 2,
-    timeSpent:20,
-    countdown: timerLength-1,
-    randoArray: Array.from({length: (noOfWords*2)}, i => mT.random())
+var currentState = {};
 
-
-  }
-}
 
 var testingSeed = seedValue;
+
+//if there is a currentState saved in localStorage, load it, otherwise create new
+function loadCurrentState(){
+  if (localStorage.currentState && localStorage.pausedSeed == seedValue){ //if localStorage exists and if it is from today, load it
+    currentState = JSON.parse(localStorage.getItem("currentState"));
+  }else { //either is doesn't exist or it is from a previous day
+    currentState = {
+      gameState: playing,
+      todaySeed: seedValue,
+      guessesOnCurrentWord:['TAROT','IRATE'],
+      wordsCorrect: 2,
+      timeSpent:20,
+      countdown: timerLength-1,
+      randoArray: Array.from({length: (noOfWords*2)}, i => mT.random())
+
+    }
+  }
+}
 
 
 
@@ -108,6 +112,7 @@ function countdownTimer() {
       $("#count").text(currentState.countdown)
       currentState.countdown--;
       if (currentState.countdown <= -1) {
+        currentState.gameState = gameFinished;
         gameOver();
 
       }
@@ -259,7 +264,8 @@ function getScore() {
   currentScore = timerLength;
   currentScore += (currentState.wordsCorrect*100);
   currentScore -= currentState.timeSpent;
-  return currentScore;
+  currentState.finalScore = currentScore;
+  return;
 }
 
 function checkHighScore (){
@@ -279,7 +285,7 @@ function gameOver(){
   $(document).off("keydown");
   $("#count").text("00");
 
-  getScore();
+  if (!currentState.finalScore) {getScore();}
   checkHighScore();
 
   if (currentState.wordsCorrect >= noOfWords){
@@ -287,10 +293,10 @@ function gameOver(){
   } else {
     $("#gameOver").append("<p>Sorry, you lose. The Final word was : " +secretWord +"</p>");
   }
-   $("#gameOver").append("<p>Your score today is " +currentScore + ". " );
-   if (currentScore < 100) {$("#gameOver").append(scoreEmojis[0]);}
-   else if (currentScore >=100 && currentScore < 700) {$("#gameOver").append(scoreEmojis[1]);}
-   if (currentScore >=700) {$("#gameOver").append(scoreEmojis[2]);}
+   $("#gameOver").append("<p>Your score today is " +currentState.finalScore + ". " );
+   if (currentState.finalScore < 100) {$("#gameOver").append(scoreEmojis[0]);}
+   else if (currentState.finalScore >=100 && currentState.finalScore < 700) {$("#gameOver").append(scoreEmojis[1]);}
+   if (currentState.finalScore >=700) {$("#gameOver").append(scoreEmojis[2]);}
 
    $("#gameOver").append("<p>Your all time High Score is " + highScore + ".</p>" );
   modalGameOver.showModal();
@@ -315,6 +321,7 @@ function KeyboardPressed(keyPressed){
               currentState.timeSpent += timerLength - currentState.countdown;
               currentState.wordsCorrect++;
               if (currentState.wordsCorrect >= noOfWords){
+                currentState.gameState = gameFinished;
                 gameOver();
               }else {
                 currentState.guessesOnCurrentWord =[]; //remove gueses from current state
@@ -346,16 +353,9 @@ function KeyboardPressed(keyPressed){
   }
 }
 
-function playedToday (){
-  if (!localStorage.playedToday){
-    //check if seed values match
-  }
-  localStorage.playedToday = seedValue;
-}
 
 function startCountdown(){
   if (startGame == 0) { //start timer if game hasn't started
-    modalStart.close();
     startGame = 1;
     $('#count').text(timerLength);
     $(".btnPlayPause").show();
@@ -383,16 +383,36 @@ function startCountdown(){
 // }
 
 function gamePaused () {
-  if (currentState.gameState == playing) {
+  $(".modal").toggle("slide", {direction: 'down'},1000);
+  if (startGame == 0) {startCountdown()}
+  else if (currentState.gameState == playing) {
     currentState.gameState = paused;
-    //currentState.pausedCountdown = countdown;
-    modalPause.showModal();
+
   }else if (currentState.gameState == paused){
-    modalPause.close();
-    //countdown = currentState.pausedCountdown;
+
     currentState.gameState = playing;
   }
 
+}
+
+function selectStartScreen() {
+  switch (currentState.gameState) {
+    case playing:
+        //modalStart.showModal();
+        break;
+    case paused:
+      startCountdown();
+      currentState.gameState = paused;
+      modalPause.showModal();
+      break;
+    case gameFinished:
+      startCountdown();
+      currentState.gameState = gameFinished;
+      gameOver();
+      break;
+    default:
+
+  }
 }
 
 function userLeavingPage(){
@@ -409,9 +429,7 @@ function setListeners(){
     if ( ((e.keyCode >= 65) && (e.keyCode <=90)) || (e.keyCode == 13) || (e.keyCode == 8)) {
       KeyboardPressed(e.key);
     }
-
   });
-
 
   //modal close and game start button
   modalBtn.click(startCountdown);
@@ -426,16 +444,19 @@ function setListeners(){
     KeyboardPressed($(this).attr("data-key"));
   });
 
-  document.addEventListener("visibilitychange", userLeavingPage);
+  //document.addEventListener("visibilitychange", userLeavingPage);
 
 }
 
 function gameStartSetup(){
+  loadCurrentState();
   createSecretWordsArray();
   newGameBoard();
   createKeyboard();
   setListeners();
-  modalStart.showModal();
+
+  selectStartScreen();
+
 }
 
 
