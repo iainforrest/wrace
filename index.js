@@ -26,7 +26,7 @@ var isWord = false;
 var rowComplete;
 var startTime, endTime;
 var currentScore, highScore;
-var playing=0, paused=1, gameFinished=3;
+var notStarted = 0, playing=1, paused=2, gameFinished=3, leftSite = 4;
 
 var xCountdown;
 var mT = new MersenneTwister(seedValue);
@@ -40,7 +40,6 @@ var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 var currentState = {};
 
 
-var testingSeed = seedValue;
 
 //if there is a currentState saved in localStorage, load it, otherwise create new
 function loadCurrentState(){
@@ -48,11 +47,11 @@ function loadCurrentState(){
     currentState = JSON.parse(localStorage.getItem("currentState"));
   }else { //either is doesn't exist or it is from a previous day
     currentState = {
-      gameState: playing,
+      gameState: notStarted,
       todaySeed: seedValue,
-      guessesOnCurrentWord:['TAROT','IRATE'],
-      wordsCorrect: 2,
-      timeSpent:20,
+      guessesOnCurrentWord:[],
+      wordsCorrect: 0,
+      timeSpent:0,
       countdown: timerLength-1,
       randoArray: Array.from({length: (noOfWords*2)}, i => mT.random())
 
@@ -258,6 +257,7 @@ function newWord () {
   loadGameBoardHintRow();
   attempt=1;
   loadGameBoardRow();
+  currentState.gameState = playing;
 }
 
 function getScore() {
@@ -299,13 +299,16 @@ function gameOver(){
    if (currentState.finalScore >=700) {$("#gameOver").append(scoreEmojis[2]);}
 
    $("#gameOver").append("<p>Your all time High Score is " + highScore + ".</p>" );
-  modalGameOver.showModal();
+  $('#startModal').addClass('hide');
+  $('#pauseModal').addClass('hide');
+  $('#gameOver').removeClass('hide');
+  toggleModal();
 
 }
 
 
 function KeyboardPressed(keyPressed){
-  if (startGame == 1){ // do nothing if the countdown hasn't startedd
+  if (currentState.gameState == playing){ // do nothing if the countdown hasn't startedd
       //get the key
     //case statement del, enter, other letter
     switch (keyPressed) {
@@ -355,19 +358,17 @@ function KeyboardPressed(keyPressed){
 
 
 function startCountdown(){
-  if (startGame == 0) { //start timer if game hasn't started
-    startGame = 1;
-    $('#count').text(timerLength);
-    $(".btnPlayPause").show();
-    countdownTimer();
+  $('#count').text(currentState.countdown + 1);
+  countdownTimer();
+  if (currentState.gameState == notStarted) { //start timer if game hasn't started
     newWord();
-    if (currentState.gameState == paused){
-      $('#count').text(currentState.countdown + 1);
-      loadGuessesFromPreviousState();
-    }
-
   }
+  if (currentState.gameState == leftSite){
+      loadGuessesFromPreviousState();
+  }
+
 }
+
 
 // function openingToastr(){
 //   toastr.info(
@@ -382,28 +383,35 @@ function startCountdown(){
 // );
 // }
 
+function toggleModal () {
+  $(".mainModal").toggle("slide", {direction: 'down'},1000);
+}
+
 function gamePaused () {
-  $(".modal").toggle("slide", {direction: 'down'},1000);
-  if (startGame == 0) {startCountdown()}
+
+  if (currentState.gameState == notStarted || (currentState.gameState == leftSite && currentState.todaySeed == seedValue)) {startCountdown()}
   else if (currentState.gameState == playing) {
     currentState.gameState = paused;
+    $('#startModal').addClass('hide');
+    $('#gameOver').addClass('hide');
+    $('#pauseModal').removeClass('hide');
 
   }else if (currentState.gameState == paused){
 
     currentState.gameState = playing;
   }
-
+  toggleModal();
 }
 
 function selectStartScreen() {
   switch (currentState.gameState) {
-    case playing:
+    case notStarted:
         //modalStart.showModal();
         break;
-    case paused:
+    case leftSite:
       startCountdown();
-      currentState.gameState = paused;
-      modalPause.showModal();
+      gamePaused();
+
       break;
     case gameFinished:
       startCountdown();
@@ -418,6 +426,7 @@ function selectStartScreen() {
 function userLeavingPage(){
   if (document.visibilityState === 'hidden') {
     if (currentState.gameState == playing){gamePaused();}
+    currentState.gameState = leftSite;
     localStorage.setItem("currentState", JSON.stringify(currentState));
     localStorage.setItem("pausedSeed",testingSeed);
   }
