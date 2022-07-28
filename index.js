@@ -6,6 +6,8 @@ const lengthOfWordsArray = wordArray.length;
 const seedValue = Math.floor((new Date() - new Date(2022,06,10))/86400000);
 const noOfHints = [4,3,3,3,2,2,2,1,1,0];
 
+const scoreEmojis = ["😢 Better luck next time.","🙂 Well Done.","😁 You're AWESOME!"];
+
 const modalText = {
   start: `<p>Welcome to Wrace.</p>
   <p>The word racing game inspired by Wordle</p>
@@ -15,19 +17,11 @@ const modalText = {
   <p>The clock has stopped and you can come back any time today</p>` ,
   gameOver: function(){return `${(currentState.wordsCorrect >= noOfWords) ? `<p>CONGRATULATIONS, YOU WIN.</p>`: `<p>Sorry, you lose. The Final word was : ${secretWord}</p>`}
   <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
-  <p>Your all time High Score is ${localStorage.highScore}.</p>`}
+  <p>Your all time High Score is ${localStorage.highScore}.</p>`},
+  practice: `Coming Soon`
 };
 
-var gameOverText;
-
-const scoreEmojis = ["😢 Better luck next time.","🙂 Well Done.","😁 You're AWESOME!"];
-
-const modalStart = document.getElementById("startModal");
-const modalGameOver = document.getElementById("gameOverModal");
-const modalPause = document.getElementById("pauseModal");
-const modalBtn = $("#modalCloseBtn");
-const modalResumeBtn = $("#modalResumeBtn");
-
+var currentTab =$('#dailyTab');
 
 var secretWordList = [];
 var secretWord;
@@ -40,7 +34,14 @@ var currentGuess;
 var isWord = false;
 var rowComplete;
 var currentScore, highScore;
+
+var isPaused = false;
+var pauseTime = 0;
+
+var tabSwitch = false;
+
 var notStarted = 0, playing=1, paused=2, gameFinished=3, leftSite = 4;
+
 
 var xCountdown;
 var mT = new MersenneTwister(seedValue);
@@ -302,6 +303,78 @@ function gameOver(){
 }
 
 
+
+
+
+function startCountdown(){
+  $('#count').text(currentState.countdown + 1);
+  countdownTimer();
+  newWord();
+
+}
+
+
+// function openingToastr(){
+//   toastr.info(
+//   'Click HERE to start...',
+//   'Ready to Play?',
+//   {
+//     showDuration: 500,
+//     hideDuration: 500,
+//     positionClass: "toast-top-center",
+//     onHidden: startCountdown
+//   }
+// );
+// }
+
+
+function toggleModal () {
+  $(".mainModal").toggle("slide", {direction: 'down'},1000);
+}
+
+function gamePaused () {
+  if (currentState.gameState == playing || currentState.gameState == leftSite) {
+    currentState.gameState = paused;
+  }else if (currentState.gameState == paused || currentState.gameState == notStarted){
+    currentState.gameState = playing;
+  }
+  selectTxtOutput();
+}
+
+function selectTxtOutput() {
+  let txt = "";
+  if (currentTab[0] == $('#practiceTab')[0]) {txt = modalText.practice }
+  else {
+    switch (currentState.gameState) {
+      case notStarted:
+        tabSwitch=true;
+        txt = modalText.start;
+        break;
+      case paused:
+        txt = modalText.pause;
+        break;
+      case gameFinished:
+        txt = modalText.gameOver();
+        break;
+      default:
+    }
+  }
+
+  $("#startModal").empty().append(txt);
+  tabSwitch ? tabSwitch=false : toggleModal();
+}
+
+function userLeavingPage(){
+  if (document.visibilityState === 'hidden') {
+    if (currentState.gameState == playing){gamePaused();}
+    if(currentState.gameState != gameFinished){ currentState.gameState = leftSite;}
+    currentState.reloadSite = "true";
+    localStorage.setItem("currentState", JSON.stringify(currentState));
+    localStorage.setItem("pausedSeed",seedValue);
+  }
+}
+
+
 function KeyboardPressed(keyPressed){
   if (currentState.gameState == playing){ // do nothing if the countdown hasn't startedd
       //get the key
@@ -351,76 +424,12 @@ function KeyboardPressed(keyPressed){
   }
 }
 
-
-function startCountdown(){
-  $('#count').text(currentState.countdown + 1);
-  countdownTimer();
-  newWord();
-  // if (currentState.gameState == notStarted) { //start timer if game hasn't started
-  //   newWord();
-  // }
-  // if (currentState.gameState == leftSite){
-  //     loadGuessesFromPreviousState();
-  // }
-
-}
-
-
-// function openingToastr(){
-//   toastr.info(
-//   'Click HERE to start...',
-//   'Ready to Play?',
-//   {
-//     showDuration: 500,
-//     hideDuration: 500,
-//     positionClass: "toast-top-center",
-//     onHidden: startCountdown
-//   }
-// );
-// }
-
-function toggleModal () {
-  $(".mainModal").toggle("slide", {direction: 'down'},1000);
-}
-
-function gamePaused () {
-  if (currentState.gameState == playing || currentState.gameState == leftSite) {
-    currentState.gameState = paused;
-  }else if (currentState.gameState == paused || currentState.gameState == notStarted){
-    currentState.gameState = playing;
-  }
+function tabSwitching (){
+  tabSwitch = true;
+  currentTab = $(this);
+  $('#practiceTab').toggleClass("white-bottom-border black-bottom-border");
+  $('#dailyTab').toggleClass("white-bottom-border black-bottom-border");
   selectTxtOutput();
-}
-
-function selectTxtOutput() {
-  let txt = "";
-  switch (currentState.gameState) {
-    case notStarted:
-      txt = modalText.start;
-      break;
-    case paused:
-      txt = modalText.pause;
-      break;
-    case gameFinished:
-      txt = modalText.gameOver();
-      break;
-    default:
-  }
-  $("#startModal").empty().append(txt);
-  if (currentState.reloadSite == "true" || currentState.gameState == notStarted){
-    currentState.reloadSite = "false";
-  }else {toggleModal();}
-
-}
-
-function userLeavingPage(){
-  if (document.visibilityState === 'hidden') {
-    if (currentState.gameState == playing){gamePaused();}
-    if(currentState.gameState != gameFinished){ currentState.gameState = leftSite;}
-    currentState.reloadSite = "true";
-    localStorage.setItem("currentState", JSON.stringify(currentState));
-    localStorage.setItem("pausedSeed",seedValue);
-  }
 }
 
 function setListeners(){
@@ -434,6 +443,10 @@ function setListeners(){
   //pause and unpause
   $(".btnPlayPause").click(gamePaused);
 
+  $('#practiceTab').click(tabSwitching);
+
+  $('#dailyTab').click(tabSwitching);
+
   //event listner for keyboard presss then take action
   $('.keyBtn').click(function(){
     KeyboardPressed($(this).attr("data-key"));
@@ -445,6 +458,8 @@ function setListeners(){
 
 function selectStartSate() {
   if (currentState.reloadSite == "true"){
+    tabSwitch = true;
+
     switch (currentState.gameState) {
       case leftSite:
         startCountdown();
@@ -463,6 +478,7 @@ function selectStartSate() {
     startCountdown();
     selectTxtOutput();
   }
+
 }
 
 function gameStartSetup(){

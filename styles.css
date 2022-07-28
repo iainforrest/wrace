@@ -97,6 +97,8 @@ table, td {
   width: 49.5%;
   height: 5vh;
   border: 1px solid black;
+  cursor: pointer;
+
 }
 
 .modalTabText{
