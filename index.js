@@ -5,7 +5,22 @@ const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
 const seedValue = Math.floor((new Date() - new Date(2022,06,10))/86400000);
 const noOfHints = [4,3,3,3,2,2,2,1,1,0];
-const scoreEmojis = ["😢 Better luck next time.</p>","🙂 Well Done.</p>","😁 You're AWESOME!</p>"];
+
+const modalText = {
+  start: `<p>Welcome to Wrace.</p>
+  <p>The word racing game inspired by Wordle</p>
+  <p>Battle the clock and see how far you can get.
+  Everyone gets the same words every day, so race your friends and see who wins.</p>`,
+  pause:`<p>You have paused Wrace</p>
+  <p>The clock has stopped and you can come back any time today</p>` ,
+  gameOver: function(){return `${(currentState.wordsCorrect >= noOfWords) ? `<p>CONGRATULATIONS, YOU WIN.</p>`: `<p>Sorry, you lose. The Final word was : ${secretWord}</p>`}
+  <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
+  <p>Your all time High Score is ${localStorage.highScore}.</p>`}
+};
+
+var gameOverText;
+
+const scoreEmojis = ["😢 Better luck next time.","🙂 Well Done.","😁 You're AWESOME!"];
 
 const modalStart = document.getElementById("startModal");
 const modalGameOver = document.getElementById("gameOverModal");
@@ -24,7 +39,6 @@ var lastLetterBox =[];
 var currentGuess;
 var isWord = false;
 var rowComplete;
-var startTime, endTime;
 var currentScore, highScore;
 var notStarted = 0, playing=1, paused=2, gameFinished=3, leftSite = 4;
 
@@ -32,10 +46,10 @@ var xCountdown;
 var mT = new MersenneTwister(seedValue);
 
 var startGame = 0;
-var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
-var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
-var keyboardRowHTML = '<div class="keyboardRow"></div>';
-var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
+const letterBoxRowHTML = '<div class="letterBoxRow"></div>';
+const letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
+const keyboardRowHTML = '<div class="keyboardRow"></div>';
+const buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 
 var currentState = {};
 
@@ -48,10 +62,10 @@ function loadCurrentState(){
   }else { //either is doesn't exist or it is from a previous day
     currentState = {
       gameState: notStarted,
-      todaySeed: seedValue,
       guessesOnCurrentWord:[],
       wordsCorrect: 0,
       timeSpent:0,
+      reloadSite : "false",
       countdown: timerLength-1,
       randoArray: Array.from({length: (noOfWords*2)}, i => mT.random())
 
@@ -105,7 +119,6 @@ function createKeyboard () {
 
 //countdown Timer
 function countdownTimer() {
-  startTime = performance.now();
   xCountdown = setInterval(function() {
     if (currentState.gameState == playing){
       $("#count").text(currentState.countdown)
@@ -113,7 +126,6 @@ function countdownTimer() {
       if (currentState.countdown <= -1) {
         currentState.gameState = gameFinished;
         gameOver();
-
       }
     }
 
@@ -242,7 +254,7 @@ function loadGuessesFromPreviousState() {
     loadGameBoardRow(); // load next rows
     //repeat with next word in the guesses array. or revert to normal game play
   });
-  currentState.gameState=playing;
+
 }
 
 function newWord () {
@@ -257,7 +269,6 @@ function newWord () {
   loadGameBoardHintRow();
   attempt=1;
   loadGameBoardRow();
-  currentState.gameState = playing;
 }
 
 function getScore() {
@@ -287,23 +298,7 @@ function gameOver(){
 
   if (!currentState.finalScore) {getScore();}
   checkHighScore();
-
-  if (currentState.wordsCorrect >= noOfWords){
-    $("#gameOver").append("<p>CONGRATULATIONS, YOU WIN.</p>");
-  } else {
-    $("#gameOver").append("<p>Sorry, you lose. The Final word was : " +secretWord +"</p>");
-  }
-   $("#gameOver").append("<p>Your score today is " +currentState.finalScore + ". " );
-   if (currentState.finalScore < 100) {$("#gameOver").append(scoreEmojis[0]);}
-   else if (currentState.finalScore >=100 && currentState.finalScore < 700) {$("#gameOver").append(scoreEmojis[1]);}
-   if (currentState.finalScore >=700) {$("#gameOver").append(scoreEmojis[2]);}
-
-   $("#gameOver").append("<p>Your all time High Score is " + highScore + ".</p>" );
-  $('#startModal').addClass('hide');
-  $('#pauseModal').addClass('hide');
-  $('#gameOver').removeClass('hide');
-  toggleModal();
-
+  selectTxtOutput();
 }
 
 
@@ -360,12 +355,13 @@ function KeyboardPressed(keyPressed){
 function startCountdown(){
   $('#count').text(currentState.countdown + 1);
   countdownTimer();
-  if (currentState.gameState == notStarted) { //start timer if game hasn't started
-    newWord();
-  }
-  if (currentState.gameState == leftSite){
-      loadGuessesFromPreviousState();
-  }
+  newWord();
+  // if (currentState.gameState == notStarted) { //start timer if game hasn't started
+  //   newWord();
+  // }
+  // if (currentState.gameState == leftSite){
+  //     loadGuessesFromPreviousState();
+  // }
 
 }
 
@@ -388,47 +384,42 @@ function toggleModal () {
 }
 
 function gamePaused () {
-
-  if (currentState.gameState == notStarted || (currentState.gameState == leftSite && currentState.todaySeed == seedValue)) {startCountdown()}
-  else if (currentState.gameState == playing) {
+  if (currentState.gameState == playing || currentState.gameState == leftSite) {
     currentState.gameState = paused;
-    $('#startModal').addClass('hide');
-    $('#gameOver').addClass('hide');
-    $('#pauseModal').removeClass('hide');
-
-  }else if (currentState.gameState == paused){
-
+  }else if (currentState.gameState == paused || currentState.gameState == notStarted){
     currentState.gameState = playing;
   }
-  toggleModal();
+  selectTxtOutput();
 }
 
-function selectStartScreen() {
+function selectTxtOutput() {
+  let txt = "";
   switch (currentState.gameState) {
     case notStarted:
-        //modalStart.showModal();
-        break;
-    case leftSite:
-      startCountdown();
-      gamePaused();
-
+      txt = modalText.start;
+      break;
+    case paused:
+      txt = modalText.pause;
       break;
     case gameFinished:
-      startCountdown();
-      currentState.gameState = gameFinished;
-      gameOver();
+      txt = modalText.gameOver();
       break;
     default:
-
   }
+  $("#startModal").empty().append(txt);
+  if (currentState.reloadSite == "true" || currentState.gameState == notStarted){
+    currentState.reloadSite = "false";
+  }else {toggleModal();}
+
 }
 
 function userLeavingPage(){
   if (document.visibilityState === 'hidden') {
     if (currentState.gameState == playing){gamePaused();}
-    currentState.gameState = leftSite;
+    if(currentState.gameState != gameFinished){ currentState.gameState = leftSite;}
+    currentState.reloadSite = "true";
     localStorage.setItem("currentState", JSON.stringify(currentState));
-    localStorage.setItem("pausedSeed",testingSeed);
+    localStorage.setItem("pausedSeed",seedValue);
   }
 }
 
@@ -440,31 +431,47 @@ function setListeners(){
     }
   });
 
-  //modal close and game start button
-  modalBtn.click(startCountdown);
-
   //pause and unpause
   $(".btnPlayPause").click(gamePaused);
-
-  modalResumeBtn.click(gamePaused);
 
   //event listner for keyboard presss then take action
   $('.keyBtn').click(function(){
     KeyboardPressed($(this).attr("data-key"));
   });
 
-  //document.addEventListener("visibilitychange", userLeavingPage);
+  document.addEventListener("visibilitychange", userLeavingPage);
 
+}
+
+function selectStartSate() {
+  if (currentState.reloadSite == "true"){
+    switch (currentState.gameState) {
+      case leftSite:
+        startCountdown();
+        loadGuessesFromPreviousState();
+        gamePaused();
+        break;
+      case gameFinished:
+        newWord();
+        loadGuessesFromPreviousState();
+        gameOver();
+        break;
+      default:
+
+    }
+  }else {
+    startCountdown();
+    selectTxtOutput();
+  }
 }
 
 function gameStartSetup(){
   loadCurrentState();
   createSecretWordsArray();
-  newGameBoard();
   createKeyboard();
   setListeners();
 
-  selectStartScreen();
+  selectStartSate();
 
 }
 
