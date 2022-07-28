@@ -3,9 +3,24 @@ const numberOfGuesses = 6;
 const timerLength = 60;
 const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
-const seedValue = Math.floor((new Date() - new Date(2022,06,11))/86400000);
+const seedValue = Math.floor((new Date() - new Date(2022,06,10))/86400000);
 const noOfHints = [4,3,3,3,2,2,2,1,1,0];
-const scoreEmojis = ["😢 Better luck next time.</p>","🙂 Well Done.</p>","😁 You're AWESOME!</p>"];
+
+const modalText = {
+  start: `<p>Welcome to Wrace.</p>
+  <p>The word racing game inspired by Wordle</p>
+  <p>Battle the clock and see how far you can get.
+  Everyone gets the same words every day, so race your friends and see who wins.</p>`,
+  pause:`<p>You have paused Wrace</p>
+  <p>The clock has stopped and you can come back any time today</p>` ,
+  gameOver: function(){return `${(currentState.wordsCorrect >= noOfWords) ? `<p>CONGRATULATIONS, YOU WIN.</p>`: `<p>Sorry, you lose. The Final word was : ${secretWord}</p>`}
+  <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
+  <p>Your all time High Score is ${localStorage.highScore}.</p>`}
+};
+
+var gameOverText;
+
+const scoreEmojis = ["😢 Better luck next time.","🙂 Well Done.","😁 You're AWESOME!"];
 
 const modalStart = document.getElementById("startModal");
 const modalGameOver = document.getElementById("gameOverModal");
@@ -13,7 +28,7 @@ const modalPause = document.getElementById("pauseModal");
 const modalBtn = $("#modalCloseBtn");
 const modalResumeBtn = $("#modalResumeBtn");
 
-var countdown = timerLength-1;
+
 var secretWordList = [];
 var secretWord;
 var hints = [];
@@ -24,22 +39,39 @@ var lastLetterBox =[];
 var currentGuess;
 var isWord = false;
 var rowComplete;
-var startTime, endTime;
 var currentScore, highScore;
-var isPaused = false;
-var pauseTime = 0;
+var notStarted = 0, playing=1, paused=2, gameFinished=3, leftSite = 4;
 
 var xCountdown;
 var mT = new MersenneTwister(seedValue);
-const randoArray = Array.from({length: (noOfWords*2)}, i => mT.random());
-
-var wordsCorrect = 0;
 
 var startGame = 0;
-var letterBoxRowHTML = '<div class="letterBoxRow"></div>';
-var letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
-var keyboardRowHTML = '<div class="keyboardRow"></div>';
-var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
+const letterBoxRowHTML = '<div class="letterBoxRow"></div>';
+const letterBoxHTML = "<div class='letterBox' data-type='empty'></div>";
+const keyboardRowHTML = '<div class="keyboardRow"></div>';
+const buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
+
+var currentState = {};
+
+
+
+//if there is a currentState saved in localStorage, load it, otherwise create new
+function loadCurrentState(){
+  if (localStorage.currentState && localStorage.pausedSeed == seedValue){ //if localStorage exists and if it is from today, load it
+    currentState = JSON.parse(localStorage.getItem("currentState"));
+  }else { //either is doesn't exist or it is from a previous day
+    currentState = {
+      gameState: notStarted,
+      guessesOnCurrentWord:[],
+      wordsCorrect: 0,
+      timeSpent:0,
+      reloadSite : "false",
+      countdown: timerLength-1,
+      randoArray: Array.from({length: (noOfWords*2)}, i => mT.random())
+
+    }
+  }
+}
 
 
 
@@ -47,9 +79,9 @@ var buttonKeyHTML = "<button type='button' data-key='' class='keyBtn'></button>"
 function createSecretWordsArray(){
 
   for (i=0; i<noOfWords; i++){
-    let newWord = wordArray[Math.floor(randoArray[i]*lengthOfWordsArray)];
+    let newWord = wordArray[Math.floor(currentState.randoArray[i]*lengthOfWordsArray)];
     while (secretWordList.includes(newWord)) {
-      newWord = wordArray[Math.floor(randoArray[i]*lengthOfWordsArray)];
+      newWord = wordArray[Math.floor(currentState.randoArray[i]*lengthOfWordsArray)];
     }
 
     secretWordList.push(newWord);
@@ -67,7 +99,6 @@ function newGameBoard(){
     }
 
   }
-  scoreBoard();
 }
 
 
@@ -88,14 +119,13 @@ function createKeyboard () {
 
 //countdown Timer
 function countdownTimer() {
-  startTime = performance.now();
   xCountdown = setInterval(function() {
-    if (!isPaused){
-      $("#count").text(countdown)
-      countdown--;
-      if (countdown == -1) {
+    if (currentState.gameState == playing){
+      $("#count").text(currentState.countdown)
+      currentState.countdown--;
+      if (currentState.countdown <= -1) {
+        currentState.gameState = gameFinished;
         gameOver();
-
       }
     }
 
@@ -118,7 +148,7 @@ function loadGameBoardHintRow() {
 
 
 
-//Load hints onto the current row
+//setup to work on the next row
 function loadGameBoardRow() {
   rowComplete = 0; // reset so that enter doesn't work
   lastLetterBox = []; // clear delete list
@@ -128,7 +158,7 @@ function loadGameBoardRow() {
 
 function createHints () {
   hints=[];
-  for (i=0; i<noOfHints[wordsCorrect]; i++) {
+  for (i=0; i<noOfHints[currentState.wordsCorrect]; i++) {
     let hintToAdd = Math.floor(mT.random()*5);
     while (hints.includes(hintToAdd)) {
       hintToAdd = Math.floor(mT.random()*5);
@@ -138,8 +168,9 @@ function createHints () {
 }
 
 function scoreBoard (){
-  let score10 = Math.floor(wordsCorrect/10);
-  let score1 = wordsCorrect%10;
+  let scoreboardCount = currentState.wordsCorrect +1;
+  let score10 = Math.floor(scoreboardCount/10);
+  let score1 = scoreboardCount%10;
   $('.score-10').text(score10);
   $('.score-1').text(score1);
 }
@@ -210,13 +241,30 @@ function checkWord(){
   });
 }
 
+//This section is for if page is loading from a saved/paused state
+function loadGuessesFromPreviousState() {
+  currentState.guessesOnCurrentWord.forEach(function(guess){ //loop through any guesses saved in current state. If none then nothing happens
+    Array.from(guess).forEach(function(letter,i){  //convert String:guess into array and iterate over
+      currentRow.children().eq(i).text(letter);  // ad letter to box on row
+    });
+
+    currentGuess = guess;
+    checkWord(); //run checkword to show correct colours etc`
+    attempt ++; //increase attempts
+    loadGameBoardRow(); // load next rows
+    //repeat with next word in the guesses array. or revert to normal game play
+  });
+
+}
+
 function newWord () {
   isWord = false;
   rowComplete = 0;
-  countdown = timerLength-1;
-  secretWord = secretWordList[wordsCorrect];
+  if (currentState.gameState == playing) { currentState.countdown = timerLength-1;} //dont reset if loading from saved data
+  secretWord = secretWordList[currentState.wordsCorrect];
   createHints();
   newGameBoard();
+  scoreBoard();
   $(".keyBtn").removeClass("correct wrongPosition wrong");
   loadGameBoardHintRow();
   attempt=1;
@@ -225,9 +273,10 @@ function newWord () {
 
 function getScore() {
   currentScore = timerLength;
-  currentScore += (wordsCorrect*100);
-  currentScore -= endTime;
-  return currentScore;
+  currentScore += (currentState.wordsCorrect*100);
+  currentScore -= currentState.timeSpent;
+  currentState.finalScore = currentScore;
+  return;
 }
 
 function checkHighScore (){
@@ -243,32 +292,18 @@ function checkHighScore (){
 
 function gameOver(){
   clearInterval(xCountdown);
-  endTime = Math.floor((performance.now()-startTime)/1000) - pauseTime;
   $('.keyBtn').off("click");
   $(document).off("keydown");
   $("#count").text("00");
 
-  getScore();
+  if (!currentState.finalScore) {getScore();}
   checkHighScore();
-
-  if (wordsCorrect >= noOfWords){
-    $("#gameOver").append("<p>CONGRATULATIONS, YOU WIN.</p>");
-  } else {
-    $("#gameOver").append("<p>Sorry, you lose. The Final word was : " +secretWord +"</p>");
-  }
-   $("#gameOver").append("<p>Your score today is " +currentScore + ". " );
-   if (currentScore < 100) {$("#gameOver").append(scoreEmojis[0]);}
-   else if (currentScore >=100 && currentScore < 700) {$("#gameOver").append(scoreEmojis[1]);}
-   if (currentScore >=700) {$("#gameOver").append(scoreEmojis[2]);}
-
-   $("#gameOver").append("<p>Your all time High Score is " + highScore + ".</p>" );
-  modalGameOver.showModal();
-
+  selectTxtOutput();
 }
 
 
 function KeyboardPressed(keyPressed){
-  if (startGame == 1){ // do nothing if the countdown hasn't startedd
+  if (currentState.gameState == playing){ // do nothing if the countdown hasn't startedd
       //get the key
     //case statement del, enter, other letter
     switch (keyPressed) {
@@ -281,16 +316,20 @@ function KeyboardPressed(keyPressed){
         if (rowComplete == 1 && isWord){
           checkWord();
           if (currentGuess == secretWord) {
-              wordsCorrect++;
-              if (wordsCorrect >= noOfWords){
+              currentState.timeSpent += timerLength - currentState.countdown;
+              currentState.wordsCorrect++;
+              if (currentState.wordsCorrect >= noOfWords){
+                currentState.gameState = gameFinished;
                 gameOver();
               }else {
+                currentState.guessesOnCurrentWord =[]; //remove gueses from current state
                 newWord();
               }
           } else {
+            currentState.guessesOnCurrentWord.push(currentGuess);
             attempt ++;
             if (attempt == numberOfGuesses) {
-              countdown = 0; //trigger game over
+              currentState.countdown = 0; //trigger game over
             } else {
               loadGameBoardRow();
             }
@@ -312,23 +351,20 @@ function KeyboardPressed(keyPressed){
   }
 }
 
-function playedToday (){
-  if (!localStorage.playedToday){
-    //check if seed values match
-  }
-  localStorage.playedToday = seedValue;
-}
 
 function startCountdown(){
-  if (startGame == 0) { //start timer if game hasn't started
-    modalStart.close();
-    startGame = 1;
-    $('#count').text(timerLength);
-    $(".btnPlayPause").show();
-    countdownTimer();
-    newWord();
-  }
+  $('#count').text(currentState.countdown + 1);
+  countdownTimer();
+  newWord();
+  // if (currentState.gameState == notStarted) { //start timer if game hasn't started
+  //   newWord();
+  // }
+  // if (currentState.gameState == leftSite){
+  //     loadGuessesFromPreviousState();
+  // }
+
 }
+
 
 // function openingToastr(){
 //   toastr.info(
@@ -343,19 +379,47 @@ function startCountdown(){
 // );
 // }
 
-function gamePaused (event) {
-  if (event.data.state == "pause"){
-    localStorage.setItem("isPaused", "true");
-    isPaused=true;
-    localStorage.setItem("pauseStart", Math.round((Date.now()/1000)));
-    modalPause.showModal();
-  }
-  else if (event.data.state == "unpause"){
-    modalPause.close();
+function toggleModal () {
+  $(".mainModal").toggle("slide", {direction: 'down'},1000);
+}
 
-    pauseTime += Math.round((Date.now()/1000)) - parseInt(localStorage.getItem("pauseStart"));
-    isPaused=false;
-    localStorage.setItem("isPaused", "false");
+function gamePaused () {
+  if (currentState.gameState == playing || currentState.gameState == leftSite) {
+    currentState.gameState = paused;
+  }else if (currentState.gameState == paused || currentState.gameState == notStarted){
+    currentState.gameState = playing;
+  }
+  selectTxtOutput();
+}
+
+function selectTxtOutput() {
+  let txt = "";
+  switch (currentState.gameState) {
+    case notStarted:
+      txt = modalText.start;
+      break;
+    case paused:
+      txt = modalText.pause;
+      break;
+    case gameFinished:
+      txt = modalText.gameOver();
+      break;
+    default:
+  }
+  $("#startModal").empty().append(txt);
+  if (currentState.reloadSite == "true" || currentState.gameState == notStarted){
+    currentState.reloadSite = "false";
+  }else {toggleModal();}
+
+}
+
+function userLeavingPage(){
+  if (document.visibilityState === 'hidden') {
+    if (currentState.gameState == playing){gamePaused();}
+    if(currentState.gameState != gameFinished){ currentState.gameState = leftSite;}
+    currentState.reloadSite = "true";
+    localStorage.setItem("currentState", JSON.stringify(currentState));
+    localStorage.setItem("pausedSeed",seedValue);
   }
 }
 
@@ -365,33 +429,51 @@ function setListeners(){
     if ( ((e.keyCode >= 65) && (e.keyCode <=90)) || (e.keyCode == 13) || (e.keyCode == 8)) {
       KeyboardPressed(e.key);
     }
-
   });
 
-
-  //modal close and game start button
-  modalBtn.click(startCountdown);
-
   //pause and unpause
-  $(".btnPlayPause").click({state: "pause"}, gamePaused);
-
-  modalResumeBtn.click({state: "unpause"}, gamePaused);
+  $(".btnPlayPause").click(gamePaused);
 
   //event listner for keyboard presss then take action
   $('.keyBtn').click(function(){
     KeyboardPressed($(this).attr("data-key"));
   });
 
+  document.addEventListener("visibilitychange", userLeavingPage);
+
+}
+
+function selectStartSate() {
+  if (currentState.reloadSite == "true"){
+    switch (currentState.gameState) {
+      case leftSite:
+        startCountdown();
+        loadGuessesFromPreviousState();
+        gamePaused();
+        break;
+      case gameFinished:
+        newWord();
+        loadGuessesFromPreviousState();
+        gameOver();
+        break;
+      default:
+
+    }
+  }else {
+    startCountdown();
+    selectTxtOutput();
+  }
 }
 
 function gameStartSetup(){
+  loadCurrentState();
   createSecretWordsArray();
-  newGameBoard();
   createKeyboard();
   setListeners();
-  modalStart.showModal();
+
+  selectStartSate();
+
 }
 
 
 gameStartSetup();
-//console.log(secretWordList);

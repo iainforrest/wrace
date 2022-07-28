@@ -24,29 +24,24 @@
 
     </div>
 
-    <dialog id="startModal">
-      <div class="modalPadding">
-        <p>Welcome to Wrace.</p>
-        <p>The word racing game inspired by Wordle</p>
-        <p>Battle the clock and see how far you can get.
-        Everyone gets the same words every day, so race your friends and see who wins.</p>
-        <button id="modalCloseBtn" class="startButton" type="button">Start Now</button>
+    <div class="mainModal">
+      <div class="modalTab left white-bottom-border" id="dailyTab">
+        <p class="modalTabText">Daily</p>
       </div>
-    </dialog>
+      <div class="modalTab right black-bottom-border" id="practiceTab">
+        <p class="modalTabText">Practice</p>
+      </div>
+      <div class="modalContent">
+        <div class="modalPadding" id="startModal">
 
-    <dialog id="gameOverModal">
-      <div class="modalPadding" id="gameOver">
+        </div>
 
       </div>
-    </dialog>
 
-    <dialog id="pauseModal">
-      <div class="modalPadding">
-        <p>You have just paused Wrace</p>
-        <p>The clock has stopped and you can come back any time today</p>
-        <button id="modalResumeBtn" class="startButton" type="button">Resume Game</button>
-      </div>
-    </dialog>
+
+    </div>
+
+
 
     <div class="wordContainer">
 
@@ -59,6 +54,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" charset="utf-8"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script type="text/javascript" src="assets/rando.js" charset="utf-8"></script>
     <script type="text/javascript" src="assets/words.js" charset="utf-8"></script>
     <script type="text/javascript" src="index.js" charset="utf-8"></script>

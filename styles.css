@@ -28,14 +28,15 @@ h1 {
 /* Title Section and gameboard */
 
 .btnPlayPause {
-  display: none;
+  cursor: pointer;
+  margin-right: 10px;
   font-family: 'Noto Emoji', sans-serif;
 }
 
 .countdown {
   display: inline-block;
   position: absolute;
-  left: 5vw;
+  left: 5%;
   margin: 2.5vh auto;
   font-size: 5vh;
   font-weight: bold;
@@ -51,7 +52,8 @@ h1 {
 .scoreBoard {
   display: inline-block;
   position: absolute;
-  right: 5vw;
+  right: 5%;
+  margin-top: 2.5vh;
 
 }
 
@@ -59,12 +61,71 @@ table, td {
     border: 2px solid grey;
     margin: calc(2.5vh - 8px) auto;
     font-size: 5vh;
+    line-height: 4vh;
     font-weight: bold;
 }
 
 /* Modals */
 
+.mainModal {
+  position: absolute;
+  top: 9vh;
+  max-width: 500px;
+  width: 95%;
+  margin: 0 2.5%;
+  border: none;
+  height: 91vh;
+  padding: 0;
+
+}
+
+.modalContent {
+  background-color: #ffffff;
+  box-shadow: 0 4px 4px 0 rgb(0 0 0 / 20%), 6px 0 20px 0 rgb(0 0 0 / 19%);
+  height: 87vh;
+  border-top: none;
+  margin-top: 5vh;
+  border: 1px solid black;
+  border-bottom: none;
+}
+
+.modalTab {
+  border-top-left-radius: 2rem;
+  border-top-right-radius: 2rem;
+  background-color: #ffffff;
+  position: absolute;
+  width: 49.5%;
+  height: 5vh;
+  border: 1px solid black;
+}
+
+.modalTabText{
+  margin: 1.5vh 0;
+}
+
+.hide {
+  display: none;
+}
+
+.left{
+  left:0;
+}
+
+.right {
+  right:0;
+}
+
+.white-bottom-border{
+  border-bottom-color: white;
+}
+
+.black-bottom-border {
+  border-bottom-color: black;
+
+}
+
 .modalPadding {
+  background-color: #ffffff;
   margin: 5vw;
 }
 
@@ -134,7 +195,7 @@ table, td {
 
 .keyBtn {
   background-color: #d3d6da;
-  border: 0px solid;
+  border: 0 solid;
   border-radius: 0.25em;
   cursor: pointer;
   height: 7vh;
@@ -167,7 +228,8 @@ table, td {
 
 
 @media screen and (min-width: 480px) {
-  dialog {
+  .mainModal {
+    width:100%;
     margin:auto;
   }
 }
