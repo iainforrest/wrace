@@ -10,19 +10,10 @@ button:active{
     box-shadow: 2px 2px #888888;
 }
 
-dialog {
-  max-width: 500px;
-  border-radius: 2rem;
-  border: none;
-  width: 94vw;
-  margin: auto 3vw;
-  padding: 0;
-}
-
 h1 {
   display: inline-block;
   font-size: 5vh;
-  margin: 2.5vh;
+  margin: auto;
 }
 
 /* Title Section and gameboard */
@@ -37,7 +28,7 @@ h1 {
   display: inline-block;
   position: absolute;
   left: 5%;
-  margin: 2.5vh auto;
+  margin: auto;
   font-size: 5vh;
   font-weight: bold;
 }
@@ -47,13 +38,14 @@ h1 {
   width: 100%;
   position: relative;
   height: 8vh;
+  margin: 2.5vh auto;
 }
 
 .scoreBoard {
   display: inline-block;
   position: absolute;
   right: 5%;
-  margin-top: 2.5vh;
+  margin: auto;
 
 }
 
@@ -69,12 +61,11 @@ table, td {
 
 .mainModal {
   position: absolute;
-  top: 9vh;
+  bottom: 0;
   max-width: 500px;
   width: 95%;
   margin: 0 2.5%;
   border: none;
-  height: 91vh;
   padding: 0;
 
 }
@@ -82,11 +73,12 @@ table, td {
 .modalContent {
   background-color: #ffffff;
   box-shadow: 0 4px 4px 0 rgb(0 0 0 / 20%), 6px 0 20px 0 rgb(0 0 0 / 19%);
-  height: 87vh;
+  height: 85vh;
   border-top: none;
   margin-top: 5vh;
   border: 1px solid black;
   border-bottom: none;
+  border-top-color: #ffffff;
 }
 
 .modalTab {
@@ -94,15 +86,25 @@ table, td {
   border-top-right-radius: 2rem;
   background-color: #ffffff;
   position: absolute;
-  width: 49.5%;
   height: 5vh;
   border: 1px solid black;
+  border-bottom: none;
+  box-sizing: border-box;
   cursor: pointer;
 
 }
 
 .modalTabText{
   margin: 1.5vh 0;
+}
+
+.playTab{
+  width: 45%;
+}
+
+.menuTab {
+  width: 10%;
+  right:0;
 }
 
 .hide {
@@ -114,15 +116,12 @@ table, td {
 }
 
 .right {
-  right:0;
+  right:10%;
 }
 
-.white-bottom-border{
-  border-bottom-color: white;
-}
 
 .black-bottom-border {
-  border-bottom-color: black;
+  border-bottom: 2px solid black;
 
 }
 
@@ -175,7 +174,7 @@ table, td {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 20px auto;
+  margin: auto;
 
 }
 
@@ -185,7 +184,7 @@ table, td {
 
 .keyboard {
   max-width: 500px;
-  margin: auto;
+  margin: 2.5vh auto 0;
   text-align: center;
 }
 

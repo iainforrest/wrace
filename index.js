@@ -24,14 +24,18 @@ const modalText = {
   <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
   <p>Your all time High Score is ${localStorage.highScore}.</p>`
   },
-  practice: `Coming Soon`
+  practice: `Coming Soon`,
+  menu: `Menu Coming Soon`
 };
 
-var currentTab = $('#dailyTab');
+var currentTab = $('#dailyTab')[0];
+const practiceTab = $('#practiceTab')[0];
+const dailyTab = $('#dailyTab')[0];
+const menuTab = $('#menuTab')[0];
+
 
 var secretWordList = [];
 var secretWord;
-var hints = [];
 var attempt = 0;
 var currentRow;
 var nextLetterBox;
@@ -65,8 +69,8 @@ var currentState = {};
 
 //if there is a currentState saved in localStorage, load it, otherwise create new
 function loadCurrentState() {
-  if (localStorage.currentState && localStorage.pausedSeed == seedValue) { //if localStorage exists and if it is from today, load it
-    currentState = JSON.parse(localStorage.getItem("currentState"));
+  if (localStorage.dailyState && localStorage.pausedSeed == seedValue) { //if localStorage exists and if it is from today, load it
+    currentState = JSON.parse(localStorage.getItem("dailyState"));
   } else { //either is doesn't exist or it is from a previous day
     currentState = {
       gameState: notStarted,
@@ -77,7 +81,10 @@ function loadCurrentState() {
       countdown: timerLength - 1,
       randoArray: Array.from({
         length: (noOfWords * 2)
-      }, i => mT.random())
+      }, i => mT.random()),
+      hintsArray: Array.from({
+        length: noOfWords
+      },(x,i) => createHints(i) )
 
     }
   }
@@ -98,7 +105,17 @@ function createSecretWordsArray() {
   }
 }
 
-
+function createHints(indexNo) {
+  let hints = [];
+  for (i = 0; i < noOfHints[indexNo]; i++) {
+    let hintToAdd = Math.floor(mT.random() * 5);
+    while (hints.includes(hintToAdd)) {
+      hintToAdd = Math.floor(mT.random() * 5);
+    }
+    hints.push(hintToAdd);
+  }
+  return hints;
+}
 
 //create game board rows
 function newGameBoard() {
@@ -129,22 +146,13 @@ function createKeyboard() {
   }
 }
 
-function createHints() {
-  hints = [];
-  for (i = 0; i < noOfHints[currentState.wordsCorrect]; i++) {
-    let hintToAdd = Math.floor(mT.random() * 5);
-    while (hints.includes(hintToAdd)) {
-      hintToAdd = Math.floor(mT.random() * 5);
-    }
-    hints.push(hintToAdd);
-  }
-}
+
 
 //Load hints onto the current row
 function loadGameBoardHintRow() {
   currentRow = $('.letterBoxRow').eq(0); // Top row
   for (i = 0; i < secretWord.length; i++) {
-    if (hints.includes(i)) {
+    if (currentState.hintsArray[currentState.wordsCorrect].includes(i)) {
       currentRow.children().eq(i).addClass("correct").text(secretWord[i]);
     } else {
       currentRow.children().eq(i).addClass("wrong").text("*");
@@ -180,7 +188,8 @@ function loadGameBoardRow() {
 
 
 function scoreBoard() {
-  let scoreboardCount = currentState.wordsCorrect + 1;
+  //if reloading from finshed game then you want to show 10 not 11
+  let scoreboardCount = currentState.wordsCorrect +1;
   let score10 = Math.floor(scoreboardCount / 10);
   let score1 = scoreboardCount % 10;
   $('.score-10').text(score10);
@@ -248,7 +257,6 @@ function newWord() {
     currentState.countdown = timerLength - 1;
   } //dont reset if loading from saved data
   secretWord = secretWordList[currentState.wordsCorrect];
-  createHints();
   newGameBoard();
   scoreBoard();
   $(".keyBtn").removeClass("correct wrongPosition wrong");
@@ -317,9 +325,10 @@ function startCountdown() {
 
 
 function toggleModal() {
-  $(".mainModal").toggle("slide", {
-    direction: 'down'
-  }, 1000);
+  $(".mainModal").slideToggle(1000);
+  // $(".mainModal").toggle("slide", {
+  //   direction: 'down'
+  // }, 1000);
 }
 
 function gamePaused() {
@@ -346,8 +355,10 @@ function gameOver() {
 
 function selectTxtOutput() {
   let txt = "";
-  if (currentTab[0] == $('#practiceTab')[0]) {
-    txt = modalText.practice
+  if (currentTab == practiceTab) {
+    txt = modalText.practice;
+  } else if (currentTab == menuTab) {
+    txt = modalText.menu;
   } else {
     switch (currentState.gameState) {
       case notStarted:
@@ -370,12 +381,15 @@ function selectTxtOutput() {
 
 function tabSwitching() {
   tabSwitch = true;
-  currentTab = $(this);
-  $('.modalTab').toggleClass("white-bottom-border black-bottom-border");
+  $(currentTab).toggleClass("wrong correct black-bottom-border");
+  $(this).toggleClass("wrong correct black-bottom-border");
+  currentTab = $(this)[0];
   selectTxtOutput();
 }
 
 function userLeavingPage() {
+
+  let location = (currentTab == dailyTab ? "dailyState" : "practiceState");
   if (document.visibilityState === 'hidden') {
     if (currentState.gameState == playing) {
       gamePaused();
@@ -384,7 +398,8 @@ function userLeavingPage() {
       currentState.gameState = leftSite;
     }
     currentState.reloadSite = "true";
-    localStorage.setItem("currentState", JSON.stringify(currentState));
+    localStorage.setItem("lastPlayed", location);
+    localStorage.setItem(location, JSON.stringify(currentState));
     localStorage.setItem("pausedSeed", seedValue);
   }
 }
@@ -416,10 +431,11 @@ function KeyboardPressed(keyPressed) {
       case 'Enter':
         if (rowComplete == 1 && isWord) {
           checkWord();
+          currentState.guessesOnCurrentWord.push(currentGuess);
           if (currentGuess == secretWord) {
             currentState.timeSpent += timerLength - currentState.countdown;
             currentState.wordsCorrect++;
-            if (currentState.wordsCorrect >= noOfWords) {
+            if (currentState.wordsCorrect == noOfWords) {
               currentState.gameState = gameFinished;
               gameOver();
             } else {
@@ -427,7 +443,7 @@ function KeyboardPressed(keyPressed) {
               newWord();
             }
           } else {
-            currentState.guessesOnCurrentWord.push(currentGuess);
+
             attempt++;
             if (attempt == numberOfGuesses) {
               currentState.countdown = 0; //trigger game over
@@ -472,8 +488,7 @@ function setListeners() {
   //switching between daily and practice tabs
   $('.modalTab').click(tabSwitching);
 
-  //save current state if the user leaves the screen
-  document.addEventListener("visibilitychange", userLeavingPage);
+
 
 }
 
@@ -488,8 +503,10 @@ function selectStartSate() {
         gamePaused();
         break;
       case gameFinished:
+        currentState.wordsCorrect --; //go back to 9 to load everything correctly
         newWord();
         loadGuessesFromPreviousState();
+        currentState.wordsCorrect ++; //go back to 10 to display game over text
         gameOver();
         break;
       default:
@@ -511,3 +528,6 @@ function gameStartSetup() {
 
 
 gameStartSetup();
+
+//save current state if the user leaves the screen
+document.addEventListener("visibilitychange", userLeavingPage);
