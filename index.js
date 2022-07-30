@@ -57,7 +57,7 @@ var notStarted = "notStarted",
 
 
 var xCountdown;
-var mT = new MersenneTwister(seedValue);
+
 
 var startGame = 0;
 const letterBoxRowHTML = '<div class="letterBoxRow"></div>';
@@ -70,10 +70,12 @@ var currentState = {};
 
 
 //if there is a currentState saved in localStorage, load it, otherwise create new
-function loadCurrentState() {
-  if (localStorage.dailyState && localStorage.pausedSeed == seedValue) { //if localStorage exists and if it is from today, load it
-    currentState = JSON.parse(localStorage.getItem("dailyState"));
+function loadCurrentState(location) {
+
+  if (localStorage.getItem(location) != null && localStorage.pausedSeed == seedValue) { //if localStorage exists and if it is from today, load it
+    currentState = JSON.parse(localStorage.getItem(location));
   } else { //either is doesn't exist or it is from a previous day
+    let mT = new MersenneTwister(currentTab == dailyTab ? seedValue : Math.floor(Math.random()*10000));
     currentState = {
       gameState: notStarted,
       guessesOnCurrentWord: [],
@@ -86,7 +88,7 @@ function loadCurrentState() {
       }, i => mT.random()),
       hintsArray: Array.from({
         length: noOfWords
-      },(x,i) => createHints(i) )
+      },(x,i) => createHints(i, mT) )
 
     }
   }
@@ -96,7 +98,7 @@ function loadCurrentState() {
 
 // Make Secret words arrays
 function createSecretWordsArray() {
-
+  secretWordList = [];
   for (i = 0; i < noOfWords; i++) {
     let newWord = wordArray[Math.floor(currentState.randoArray[i] * lengthOfWordsArray)];
     while (secretWordList.includes(newWord)) {
@@ -107,12 +109,12 @@ function createSecretWordsArray() {
   }
 }
 
-function createHints(indexNo) {
+function createHints(indexNo, rando) {
   let hints = [];
   for (i = 0; i < noOfHints[indexNo]; i++) {
-    let hintToAdd = Math.floor(mT.random() * 5);
+    let hintToAdd = Math.floor(rando.random() * 5);
     while (hints.includes(hintToAdd)) {
-      hintToAdd = Math.floor(mT.random() * 5);
+      hintToAdd = Math.floor(rando.random() * 5);
     }
     hints.push(hintToAdd);
   }
@@ -336,10 +338,15 @@ function toggleModal() {
 function gamePaused() {
   if (currentState.gameState == playing || currentState.gameState == leftSite) {
     currentState.gameState = paused;
+    pauseTab = currentTab;
   } else if (currentState.gameState == paused || currentState.gameState == notStarted || currentState.reloadSite == "true") {
     if (pauseTab != currentTab){
-
-
+      clearInterval(xCountdown);
+      saveCurrentStateToLocalStorage(currentTab == dailyTab ? "practiceState" : "dailyState");
+      loadCurrentState(currentTab == dailyTab ? "dailyState" : "practiceState");
+      createSecretWordsArray();
+      startCountdown();
+      loadGuessesFromPreviousState();
     }
     currentState.gameState = playing;
   }
@@ -394,27 +401,28 @@ function tabSwitching() {
   selectTxtOutput();
 }
 
-function userLeavingPage() {
+function saveCurrentStateToLocalStorage(location){
+  if (currentState.gameState == playing) {
+    gamePaused();
+  }
+  if (currentState.gameState != gameFinished) {
+    currentState.gameState = leftSite;
+  }
+  currentState.reloadSite = "true";
+  localStorage.setItem("lastPlayed", location);
+  localStorage.setItem(location, JSON.stringify(currentState));
+  localStorage.setItem("pausedSeed", seedValue);
 
-  let location = (currentTab == dailyTab ? "dailyState" : "practiceState");
+}
+
+function userLeavingPage() {
   if (document.visibilityState === 'hidden') {
-    if (currentState.gameState == playing) {
-      gamePaused();
-    }
-    if (currentState.gameState != gameFinished) {
-      currentState.gameState = leftSite;
-    }
-    currentState.reloadSite = "true";
-    localStorage.setItem("lastPlayed", location);
-    localStorage.setItem(location, JSON.stringify(currentState));
-    localStorage.setItem("pausedSeed", seedValue);
+    saveCurrentStateToLocalStorage(currentTab == dailyTab ? "dailyState" : "practiceState");
   }else {
     if (currentState.gameState == "leftSite"){
       currentState.gameState = paused;
     }
   }
-
-
 }
 
 
@@ -535,7 +543,7 @@ function selectStartSate() {
 }
 
 function gameStartSetup() {
-  loadCurrentState();
+  loadCurrentState(currentTab == dailyTab ? "dailyState" : "practiceState");
   createSecretWordsArray();
   createKeyboard();
   setListeners();
