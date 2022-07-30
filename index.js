@@ -29,9 +29,11 @@ const modalText = {
 };
 
 var currentTab = $('#dailyTab')[0];
+var pauseTab = $('#dailyTab')[0];
 const practiceTab = $('#practiceTab')[0];
 const dailyTab = $('#dailyTab')[0];
 const menuTab = $('#menuTab')[0];
+
 
 
 var secretWordList = [];
@@ -334,9 +336,14 @@ function toggleModal() {
 function gamePaused() {
   if (currentState.gameState == playing || currentState.gameState == leftSite) {
     currentState.gameState = paused;
-  } else if (currentState.gameState == paused || currentState.gameState == notStarted) {
+  } else if (currentState.gameState == paused || currentState.gameState == notStarted || currentState.reloadSite == "true") {
+    if (pauseTab != currentTab){
+
+
+    }
     currentState.gameState = playing;
   }
+  currentState.reloadSite = "false";
   selectTxtOutput();
 }
 
@@ -401,8 +408,17 @@ function userLeavingPage() {
     localStorage.setItem("lastPlayed", location);
     localStorage.setItem(location, JSON.stringify(currentState));
     localStorage.setItem("pausedSeed", seedValue);
+  }else {
+    if (currentState.gameState == "leftSite"){
+      currentState.gameState = paused;
+    }
   }
+
+
 }
+
+
+
 
 //delete button
 function deleteButtonPressed() {
