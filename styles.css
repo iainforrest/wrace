@@ -62,7 +62,7 @@ table, td {
 .mainModal {
   position: absolute;
   bottom: 0;
-  top:13vh;
+  height:87vh;
   background: #fff;
   max-width: 500px;
   width: 95%;
@@ -73,22 +73,24 @@ table, td {
 }
 
 .modalContent {
-  background-color: #ffffff;
+  background-color: #fff;
   box-shadow: 0 4px 4px 0 rgb(0 0 0 / 20%), 6px 0 20px 0 rgb(0 0 0 / 19%);
   border-top: none;
   margin-top: 5vh;
   border: 1px solid black;
   border-bottom: none;
-  border-top-color: #ffffff;
+  border-top-color: #fff;
   position:absolute;
   bottom:0;
   top:0;
+  left:0;
+  right:0;
 }
 
 .modalTab {
   border-top-left-radius: 2rem;
   border-top-right-radius: 2rem;
-  background-color: #ffffff;
+  background-color: #fff;
   position: absolute;
   height: 5vh;
   border: 1px solid black;
@@ -130,7 +132,7 @@ table, td {
 }
 
 .modalPadding {
-  background-color: #ffffff;
+  background-color: #fff;
   margin: 5vw;
 }
 
@@ -218,17 +220,17 @@ table, td {
 
 .wrong {
   background-color: #787c7e;
-  color: white;
+  color: #fff;
 }
 
 .wrongPosition {
   background-color: #c9b458;
-  color: white;
+  color: #fff;
 }
 
 .correct{
   background-color: #6aaa64;
-  color: white;
+  color: #fff;
 }
 
 
