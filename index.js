@@ -439,6 +439,8 @@ function tabSwitching() {
   currentTab = $(this)[0];
   if (currentTab != menuTab) {
     loadCurrentStateText();
+  }else {
+    selectTxtOutput();
   }
 }
 
