@@ -390,6 +390,12 @@ function gameOver() {
   selectTxtOutput();
 }
 
+function practiceReset(){
+  localStorage.removeItem("practiceState");
+  loadCurrentState("practiceState");
+  gamePlayPause();
+}
+
 function selectTxtOutput() {
   let txt = "";
   if (currentTab == menuTab) {
@@ -408,9 +414,18 @@ function selectTxtOutput() {
       default:
     }
   }
-  txt += currentTab == practiceTab ? "practicing" : ""; //add practicing to if on Practice Tab
+  //add practicing to if on Practice Tab
+  if (currentTab == practiceTab){
+    txt += "practicing";
+    if (currentState.gameOver) {
+      txt += `<p>Would you like to practice again?</p>
+      <button type="button" class="startButton" id="btn-TryAgain">Try Again</button>`;
+
+    }
+  }
 
   $("#startModal").empty().append(txt);
+  $('#btn-TryAgain').click(practiceReset);
   tabSwitch ? tabSwitch = false : toggleModal();
 }
 
