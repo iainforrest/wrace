@@ -228,23 +228,34 @@ function checkRow() {
 function checkWord() {
   Array.from(currentGuess).forEach(function(elt, i, guess) { //turn currentGuess string into an array and loop through each item eg "hello" = [h,e,l,l,o]
     let multiLetter = getAllIndexes(secretWord, elt); //check if the letter is in secretWord if it is, it will return an array of indexes eg. l in hello returns [2,3]
-    multiLetter.forEach(function(MLElt, MLi) { //loop through array of indexes, if letter doesn't exist in secretWord, then list will be 0 length
+    let guessMultiLetter = getAllIndexes(currentGuess, elt);
+    multiLetter.forEach(function(mLElt, mLi) { //loop through array of indexes, if letter doesn't exist in secretWord, then list will be 0 length
       //MLElt is the index of the letter in the secret word eg 2
       //MLi is the position of the index of the letter in the arrary eg 0
-      if (MLElt == i) { // eg does 2 = i (the current position we are in the guess word)
+      if (mLElt == i) { // eg does 2 = i (the current position we are in the guess word)
         //eg guess "lemon", secret = "hello"
         //MELt would be [2,3], i = 0 correct letter, wrong place
         //eg guess "yelow", secret = "hello"
         //MELt would be [2], i = 2 - correct letter, correct place
         currentRow.children().eq(i).addClass("correct");
-        $("button[data-key='" + elt.toLowerCase() + "']").addClass("correct")
+        $("button[data-key='" + elt.toLowerCase() + "']").addClass("correct");
         return;
-      } else if (secretWord[MLElt] == currentGuess[MLElt]) { //for when you guess a double letter but there is only 1
+      } else if (secretWord[mLElt] == currentGuess[mLElt]) { //for when you guess a double letter but there is only 1
         return;
-      } else if (multiLetter.length >= getAllIndexes(currentGuess, elt).length) { //makes sure letter doesn't exist more times
+      } else if (multiLetter.length >= guessMultiLetter.length) { //makes sure letter doesn't exist more times
         currentRow.children().eq(i).addClass("wrongPosition");
-        $("button[data-key='" + elt.toLowerCase() + "']").addClass("wrongPosition")
+        $("button[data-key='" + elt.toLowerCase() + "']").addClass("wrongPosition");
         return;
+      // So far, letter exists in the word, is not in the correct position but has been guessed more than once. ie. guess = hello, secret = lemon
+      // loop through the guesses to ensure none of the other ones are correct,
+      // if none of them do, then mark this one as wrong position and exit so that you don't do the other ones.
+      }else if (guessMultiLetter.length > multiLetter.length) {
+        if (i == guessMultiLetter[guessMultiLetter.length -1]){
+          currentRow.children().eq(i).addClass("wrongPosition");
+          $("button[data-key='" + elt.toLowerCase() + "']").addClass("wrongPosition");
+          return;
+        }
+
       }
 
     });
