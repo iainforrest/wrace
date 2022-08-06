@@ -23,45 +23,63 @@ h1 {
   margin: auto;
 }
 
+
+
 /* Title Section and gameboard */
 
 .btnPlayPause {
-  cursor: pointer;
-  margin-right: 10px;
-  font-family: 'Noto Emoji', sans-serif;
-}
 
-.countdown {
-  display: inline-block;
-  position: absolute;
-  left: 5%;
-  margin: auto;
+  margin-right: 10px;
   font-size: 5vh;
-  font-weight: bold;
 }
 
 .header {
-  display:inline-block;
+  display:inline-flex;
   width: 100%;
   position: relative;
   height: 8%;
   margin: 2.5vh auto;
 }
-
-.scoreBoard {
-  display: inline-block;
-  position: absolute;
-  right: 5%;
+.header-row {
+  display: inline-flex;
+  float: left;
+  font-size: 2rem;
   margin: auto;
+}
 
+.countdown {
+  flex: 1 1 15%;
+  font-weight: bold;
+}
+
+.playPause{
+flex: 1 1 15%;
+}
+.material-symbols-outlined {
+  font-size: 5rem;
+  line-height: .5;
+  margin-right: 2vw;
+  border: 3px solid;
+  border-radius: 2rem;
+  cursor: pointer;
+}
+
+.heading {
+flex: 1 1 40%;
+}
+
+.spacer {
+  flex: 1 1 15%;
+}
+.scoreBoard {
+flex: 1 1 15%;
 }
 
 table, td {
     border: 2px solid grey;
-    margin: calc(2.5vh - 8px) auto;
-    font-size: 5vh;
-    line-height: 4vh;
+    line-height: 2rem;
     font-weight: bold;
+    border-spacing: 1px;
 }
 
 /* Modals */
