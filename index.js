@@ -587,6 +587,7 @@ function gameStartSetup() {
   }
   tabSwitch = true; // to keep modal up
   loadCurrentStateText();
+  setUpScreenFromState();
 
 }
 

@@ -10,6 +10,7 @@ body {
   min-height: 100vh;
   /* mobile viewport bug fix */
   min-height: -webkit-fill-available;
+  position: relative;
 }
 
 button:active{
@@ -27,23 +28,18 @@ h1 {
 
 /* Title Section and gameboard */
 
-.btnPlayPause {
-
-  margin-right: 10px;
-  font-size: 5vh;
-}
-
 .header {
   display:inline-flex;
-  width: 100%;
-  position: relative;
-  height: 8%;
-  margin: 2.5vh auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 1%;
+  bottom: 90%;
 }
 .header-row {
   display: inline-flex;
   float: left;
-  font-size: 2rem;
+  font-size: 5vh;
   margin: auto;
 }
 
@@ -57,7 +53,7 @@ h1 {
 flex: 1 1 20%;
 }
 .material-symbols-outlined {
-  font-size: 5rem;
+  font-size: 10vh;
   line-height: .5;
   margin-right: 2vw;
   border: 3px solid;
@@ -79,7 +75,7 @@ margin-right: 10px;
 
 table, td {
     border: 2px solid grey;
-    line-height: 2rem;
+    line-height: 5vh;
     font-weight: bold;
     border-spacing: 1px;
 }
@@ -89,13 +85,14 @@ table, td {
 .mainModal {
   position: absolute;
   bottom: 0;
-  height:87%;
+  height:90%;
   background: #fff;
   max-width: 500px;
   width: 95%;
   margin: 0 2.5%;
   border: none;
   padding: 0;
+  z-index: 99;
 
 }
 
@@ -208,6 +205,11 @@ table, td {
   flex-direction: column;
   justify-content: center;
   margin: auto;
+  position: absolute;
+  left: 0;
+  right:0;
+  top : 8%;
+  bottom : 25%;
 
 }
 
@@ -216,15 +218,18 @@ table, td {
 /* KeyBoard */
 
 .keyboard {
-  max-width: 500px;
-  margin: 2.5vh auto 0;
+  position: absolute;
+  bottom: 1%;
+  left: 0;
+  right: 0;
+  top:75%;
   text-align: center;
 }
 
 .keyboardRow {
-  margin: 5px auto;
+  margin: 1.5% auto;
   text-align: center;
-  height: 8vh;
+  height: 30%;
 }
 
 .keyBtn {
@@ -232,7 +237,7 @@ table, td {
   border: 0 solid;
   border-radius: 0.25em;
   cursor: pointer;
-  height: 7vh;
+  height: 100%;
   margin: 2px;
   padding: 0;
   font-size: 3.5vh;
