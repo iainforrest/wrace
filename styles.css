@@ -48,12 +48,13 @@ h1 {
 }
 
 .countdown {
-  flex: 1 1 15%;
+  flex: 1 1 10%;
   font-weight: bold;
+  margin-left: 10px;
 }
 
 .playPause{
-flex: 1 1 15%;
+flex: 1 1 20%;
 }
 .material-symbols-outlined {
   font-size: 5rem;
@@ -69,10 +70,11 @@ flex: 1 1 40%;
 }
 
 .spacer {
-  flex: 1 1 15%;
+  flex: 1 1 20%;
 }
 .scoreBoard {
-flex: 1 1 15%;
+flex: 1 1 10%;
+margin-right: 10px;
 }
 
 table, td {
@@ -240,7 +242,7 @@ table, td {
 
 /* Checking if letters and words are correct or exist */
 .wordDoesntExist {
-  color: red;
+  color: #e51e1e;
 }
 
 .wrong {
@@ -258,6 +260,10 @@ table, td {
   color: #fff;
 }
 
+.pauseGame {
+  background-color: #e51e1e;
+  color: #fff;
+}
 
 @media screen and (min-width: 480px) {
   .mainModal {

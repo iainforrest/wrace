@@ -336,6 +336,7 @@ function setUpScreenFromState(){
 
 function toggleModal() {
   $(".mainModal").slideToggle(1000);
+  $('#btnPlayPause').toggleClass('correct pauseGame');
   // $(".mainModal").toggle("slide", {
   //   direction: 'down'
   // }, 1000);
