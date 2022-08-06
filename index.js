@@ -541,7 +541,7 @@ function setListeners() {
   });
 
   //pause and unpause
-  $(".btnPlayPause").click(gamePlayPause);
+  $("#btnPlayPause").click(gamePlayPause);
 
   //switching between daily and practice tabs
   $('.modalTab').click(tabSwitching);

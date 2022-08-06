@@ -4,7 +4,9 @@
     <meta charset="utf-8">
     <meta name=viewport content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Wrace</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"> -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Emoji&display=swap" rel="stylesheet">
@@ -13,14 +15,25 @@
   <body>
 
     <div class="header">
-      <div id="count" class="countdown"></div>
-      <h1 class="header-h1"><span class="btnPlayPause">⏯️</span> WRACE</h1>
-      <table class="scoreBoard">
-        <tr>
-          <td class="score-10">0</td>
-          <td class="score-1">0</td>
-        </tr>
-      </table>
+      <div id="count" class="countdown header-row">10</div>
+      <div class="playPause header-row">
+        <span class="material-symbols-outlined correct" id="btnPlayPause">&#xf137</span>
+      </div>
+      <div class="heading header-row">
+        <h1 class="header-h1"> WRACE</h1>
+      </div>
+      <div class="spacer header-row">
+
+      </div>
+      <div class="scoreBoard header-row">
+        <table class="">
+          <tr>
+            <td class="score-10">0</td>
+            <td class="score-1">0</td>
+          </tr>
+        </table>
+      </div>
+
 
     </div>
 
