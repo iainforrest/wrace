@@ -304,6 +304,7 @@ function checkHighScore() {
 
 //countdown Timer
 function countdownTimer() {
+  if (xCountdown) {clearInterval(xCountdown);}
   xCountdown = setInterval(function() {
     if (currentState.gameState == playing) {
       $("#count").text(currentState.countdown)
@@ -587,7 +588,6 @@ function gameStartSetup() {
   }
   tabSwitch = true; // to keep modal up
   loadCurrentStateText();
-  setUpScreenFromState();
 
 }
 
