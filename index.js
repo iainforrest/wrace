@@ -17,12 +17,17 @@ const modalText = {
   <p>The word racing game inspired by Wordle</p>
   <p>Battle the clock and see how far you can get.
   Everyone gets the same words every day, so race your friends and see who wins.</p>`,
+  firstTimer: `<p>If this is your first time here, then you might want to try a Practice session first. There's only 1 daily challenge each day.</p>
+  <p>Just click on the Practice tab above then on the Play button up the top</p>`,
   pause: `<p>You have paused Wrace</p>
   <p>The clock has stopped and you can come back any time today</p>`,
   gameOver: function() {
+    let emojis = emojiresult();
     return `${(currentState.wordsCorrect >= noOfWords) ? `<p>CONGRATULATIONS, YOU WIN.</p>`: `<p>Sorry, you lose. The Final word was : ${currentState.lastWord}</p>`}
+    <p>${emojis}</p>
+    <p>You got ${currentState.wordsCorrect} word${(currentState.wordsCorrect==1)?"":"s "}correct</p>
   <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
-  <p>Your all time High Score is ${localStorage.highScore}.</p>`
+  <p>Your all time ${tabTxt} High Score is ${(currentTab == dailyTab) ? localStorage.dailyHighScore : localStorage.practiceHighScore }.</p>`
   },
   practice: `Coming Soon`,
   menu: `Menu Coming Soon`
@@ -34,7 +39,7 @@ const dailyTab = $('#dailyTab')[0];
 const menuTab = $('#menuTab')[0];
 
 
-
+var tabTxt;
 var secretWordList = [];
 var secretWord;
 var attempt = 0;
@@ -281,6 +286,14 @@ function newWord() {
   loadGameBoardRow();
 }
 
+function emojiresult () {
+  let x ="";
+  for (i=0; i< noOfWords; i++){
+    x += (i<currentState.wordsCorrect ? "🟩" : (i == currentState.wordsCorrect ? "🟥" : "🔲"));
+  }
+  return x;
+}
+
 function getScore() {
   currentScore = timerLength;
   currentScore += (currentState.wordsCorrect * 100);
@@ -290,15 +303,16 @@ function getScore() {
 }
 
 function checkHighScore() {
-  if (!localStorage.highScore) {
+  let testHighScoreExists = localStorage.getItem(currentTab == dailyTab ? "dailyHighScore" : "practiceHighScore")
+  if (!testHighScoreExists) {
     highScore = currentScore
   } else {
-    highScore = localStorage.highScore
+    highScore = testHighScoreExists;
   }
   if (currentScore > highScore) {
     highScore = currentScore
   }
-  localStorage.highScore = highScore;
+  localStorage.setItem((currentTab == dailyTab ? "dailyHighScore" : "practiceHighScore"), highScore);
 
 }
 
@@ -372,7 +386,6 @@ function gamePlayPause() {
     localStorage.setItem("lastPlayed", currentTab == dailyTab ? "dailyState" : "practiceState");
   }else if (currentState.gameState == paused || currentState.gameState == notStarted){
     if ((localStorage.lastPlayed == "dailyState" ? dailyTab : practiceTab )!= currentTab || currentState.gameState == notStarted) {
-      if(xCountdown){clearInterval(xCountdown);}
       setUpScreenFromState();
     }
     currentState.gameState = playing;
@@ -410,6 +423,7 @@ function practiceReset(){
 }
 
 function selectTxtOutput() {
+  tabTxt = currentTab == practiceTab ? "Practice" : "Daily";
   let txt = "";
   if (currentTab == menuTab) {
     txt = modalText.menu;
@@ -417,6 +431,9 @@ function selectTxtOutput() {
     switch (currentState.gameState) {
       case notStarted:
         txt = modalText.start;
+        if (!localStorage.finalScore && currentTab == dailyTab){
+          txt += modalText.firstTimer;
+        }
         break;
       case paused:
         txt = modalText.pause;
@@ -429,7 +446,6 @@ function selectTxtOutput() {
   }
   //add practicing to if on Practice Tab
   if (currentTab == practiceTab){
-    txt += "practicing";
     if (currentState.gameOver) {
       txt += `<p>Would you like to practice again?</p>
       <button type="button" class="startButton" id="btn-TryAgain">Try Again</button>`;
