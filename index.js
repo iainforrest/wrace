@@ -332,11 +332,10 @@ function CopyToClipboard (event) {
 
 function mobileShare () {
   let shareText = `Wrace.com - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n`;
-  shareText += $('#shareScore').html();
+  shareText += $('#shareScore').text().replace(/(<([^>]+)>)/gi, "");
   let shareData = {
     title: "Wrace Score",
-    text : shareText,
-    url: 'wrace.com'
+    text : shareText
   }
   navigator.share(shareData);
 }
