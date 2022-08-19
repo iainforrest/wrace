@@ -97,7 +97,7 @@ table, td {
   margin: 0 2.5%;
   border: none;
   padding: 0;
-  z-index: 99;
+  z-index: 95;
 
 }
 
@@ -184,6 +184,15 @@ table, td {
 .share-icon {
   margin-right: 10px;
 }
+
+/* #temp_element {
+  position: absolute;
+  right: 0;
+  left:0;
+  bottom: 0;
+  height: 200px;
+  z-index: 99;
+} */
 
 /* GameBoard */
 .col-1 {

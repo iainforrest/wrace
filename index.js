@@ -25,12 +25,12 @@ const modalText = {
     let emojis = emojiresult();
     return `${(currentState.wordsCorrect >= noOfWords) ? `<p>CONGRATULATIONS, YOU WIN.</p>`: `<p>Sorry, you lose. The Final word was : ${currentState.lastWord}</p>`}
     <div id="shareScore">
-    <p>${emojis}</p>
-    <p>You got ${currentState.wordsCorrect}/10 words correct</p>
-  <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
-  </div>
-  <p>Your all time ${tabTxt} High Score is ${(currentTab == dailyTab) ? localStorage.dailyHighScore : localStorage.practiceHighScore }.</p>
-  <button type="button" class="shareMe startButton"><span class="material-symbols-outlined share-icon">share</span> Share</button>`
+    <p>${emojis}<br>
+    You got ${currentState.wordsCorrect}/10 words correct.</p>
+    <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
+    </div>
+    <p>Your all time ${tabTxt} High Score is ${(currentTab == dailyTab) ? localStorage.dailyHighScore : localStorage.practiceHighScore }.</p>
+    <button type="button" class="shareMe startButton"><span class="material-symbols-outlined share-icon">share</span> Share</button>`
   },
   practice: `Coming Soon`,
   menu: `Menu Coming Soon`
@@ -299,24 +299,47 @@ function emojiresult () {
 
 function CopyToClipboard (event) {
   // Create a new textarea element and give it id='temp_element'
-  const textarea = document.createElement('textarea')
-  textarea.id = 'temp_element'
+  const textarea = document.createElement('textarea');
+  textarea.id = 'temp_element';
   // Optional step to make less noise on the page, if any!
-  textarea.style.height = 0
+  textarea.style.height = 0;
   // Now append it to your page somewhere, I chose <body>
-  document.body.appendChild(textarea)
+  document.body.appendChild(textarea);
   // Give our textarea a value of whatever inside the div of id=containerid
-  textarea.value = document.getElementById(event.data.containerId).innerText
+  textarea.value = `Wrace.com - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n\n`;
+  textarea.value += document.getElementById(event.data.containerId).innerText;
+
   // Now copy whatever inside the textarea to clipboard
-  const selector = document.querySelector('#temp_element')
-  selector.select()
-  document.execCommand('copy')
+  const selector = document.querySelector('#temp_element');
+  selector.select();
+  document.execCommand('copy');
   // Remove the textarea
-  document.body.removeChild(textarea)
-  alert("Copied to clipboard");
+  document.body.removeChild(textarea);
+  Toastify({
+    text: "copied to clipboard",
+    className: "info",
+    offset: {
+    x: '40vw', // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+    y: '80vh' // vertical axis - can be a number or a string indicating unity. eg: '2em'
+    },
+    duration: 1000,
+    stopOnFocus: false,
+    style: {
+      background: "#000000",
+    }
+  }).showToast();
 }
 
-
+function mobileShare () {
+  let shareText = `Wrace.com - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n`;
+  shareText += $('#shareScore').html();
+  let shareData = {
+    title: "Wrace Score",
+    text : shareText,
+    url: 'wrace.com'
+  }
+  navigator.share(shareData);
+}
 
 
 function getScore() {
@@ -479,7 +502,8 @@ function selectTxtOutput() {
 
   $("#startModal").empty().append(txt);
   $('#btn-TryAgain').click(practiceReset);
-  $('.shareMe').click({containerId: "shareScore"}, CopyToClipboard);
+  //$('.shareMe').click({containerId: "shareScore"}, CopyToClipboard);
+  $('.shareMe').click(mobileShare);
   tabSwitch ? tabSwitch = false : toggleModal();
 }
 
