@@ -52,7 +52,12 @@ h1 {
 .playPause{
 flex: 1 1 20%;
 }
+
 .material-symbols-outlined {
+
+}
+
+.playPauseBtn{
   font-size: 10vh;
   line-height: .5;
   margin-right: 2vw;
@@ -169,6 +174,15 @@ table, td {
   padding: 2px 20px;
   cursor: pointer;
   margin: 0 auto;
+}
+
+.shareMe {
+  display: flex;
+  align-items: center;
+}
+
+.share-icon {
+  margin-right: 10px;
 }
 
 /* GameBoard */
