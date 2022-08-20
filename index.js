@@ -297,7 +297,7 @@ function emojiresult () {
   return x;
 }
 
-function CopyToClipboard () {
+function CopyToClipboard (shareText) {
   // Create a new textarea element and give it id='temp_element'
   const textarea = document.createElement('textarea');
   textarea.id = 'temp_element';
@@ -306,7 +306,7 @@ function CopyToClipboard () {
   // Now append it to your page somewhere, I chose <body>
   document.body.appendChild(textarea);
   // Give our textarea a value of whatever inside the div of id=containerid
-  textarea.value = `Wrace.com - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n\n`;
+  textarea.value = shareText;
   textarea.value += document.getElementById("shareScore").innerText;
 
   // Now copy whatever inside the textarea to clipboard
@@ -330,8 +330,7 @@ function CopyToClipboard () {
   }).showToast();
 }
 
-function mobileShare () {
-  let shareText = `Wrace.com - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n`;
+function mobileShare (shareText) {
   shareText += $('#shareScore').text().replace(/(<([^>]+)>)/gi, "");
   let shareData = {
     title: "Wrace Score",
@@ -478,7 +477,7 @@ function selectTxtOutput() {
     switch (currentState.gameState) {
       case notStarted:
         txt = modalText.start;
-        if (!localStorage.finalScore && currentTab == dailyTab){
+        if (!localStorage.dailyHighScore && currentTab == dailyTab){
           txt += modalText.firstTimer;
         }
         break;
@@ -502,10 +501,11 @@ function selectTxtOutput() {
   $("#startModal").empty().append(txt);
   $('#btn-TryAgain').click(practiceReset);
   $('.shareMe').click(function() {
+    let shareText = `Wrace.me - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n`;
     if (window.innerWidth <= 991) {
-      mobileShare();
+      mobileShare(shareText);
     }else {
-      CopyToClipboard();
+      CopyToClipboard(shareText);
     }
   });
 
