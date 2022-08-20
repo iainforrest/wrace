@@ -27,7 +27,7 @@ const modalText = {
     <div id="shareScore">
     <p>${emojis}<br>
     You got ${currentState.wordsCorrect}/10 words correct.</p>
-    <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 700 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
+    <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 1000 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
     </div>
     <p>Your all time ${tabTxt} High Score is ${(currentTab == dailyTab) ? localStorage.dailyHighScore : localStorage.practiceHighScore }.</p>
     <button type="button" class="shareMe startButton"><span class="material-symbols-outlined share-icon">share</span> Share</button>`
@@ -52,7 +52,7 @@ var lastLetterBox = [];
 var currentGuess;
 var isWord = false;
 var rowComplete;
-var currentScore, highScore;
+var highScore;
 
 var tabSwitch = false;
 
@@ -88,7 +88,7 @@ function loadCurrentState(location) {
       gameState: notStarted,
       guessesOnCurrentWord: [],
       wordsCorrect: 0,
-      timeSpent: 0,
+      finalScore: timerLength,
       reloadSite: "false",
       gameOver: false,
       countdown: timerLength - 1,
@@ -340,23 +340,15 @@ function mobileShare (shareText) {
 }
 
 
-function getScore() {
-  currentScore = timerLength;
-  currentScore += (currentState.wordsCorrect * 100);
-  currentScore -= currentState.timeSpent;
-  currentState.finalScore = currentScore;
-  return;
-}
-
 function checkHighScore() {
   let testHighScoreExists = localStorage.getItem(currentTab == dailyTab ? "dailyHighScore" : "practiceHighScore")
   if (!testHighScoreExists) {
-    highScore = currentScore
+    highScore = currentState.finalScore;
   } else {
     highScore = testHighScoreExists;
   }
-  if (currentScore > highScore) {
-    highScore = currentScore
+  if (currentState.finalScore > highScore) {
+    highScore = currentState.finalScore
   }
   localStorage.setItem((currentTab == dailyTab ? "dailyHighScore" : "practiceHighScore"), highScore);
 
@@ -576,7 +568,12 @@ function KeyboardPressed(keyPressed) {
           checkWord();
           currentState.guessesOnCurrentWord.push(currentGuess);
           if (currentGuess == secretWord) {
-            currentState.timeSpent += timerLength - currentState.countdown;
+            // minus time taken
+            currentState.finalScore -= timerLength - currentState.countdown;
+            // add 100 for a correct word
+            currentState.finalScore += 100;
+            // add 10 for guesses taken 5 gueses = 0, 1 guess = 50
+            currentState.finalScore += (numberOfGuesses - attempt)*10;
             currentState.wordsCorrect++;
             if (currentState.wordsCorrect == noOfWords) {
               gameOver();
