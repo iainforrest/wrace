@@ -297,7 +297,7 @@ function emojiresult () {
   return x;
 }
 
-function CopyToClipboard (event) {
+function CopyToClipboard () {
   // Create a new textarea element and give it id='temp_element'
   const textarea = document.createElement('textarea');
   textarea.id = 'temp_element';
@@ -307,7 +307,7 @@ function CopyToClipboard (event) {
   document.body.appendChild(textarea);
   // Give our textarea a value of whatever inside the div of id=containerid
   textarea.value = `Wrace.com - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n\n`;
-  textarea.value += document.getElementById(event.data.containerId).innerText;
+  textarea.value += document.getElementById("shareScore").innerText;
 
   // Now copy whatever inside the textarea to clipboard
   const selector = document.querySelector('#temp_element');
@@ -501,8 +501,14 @@ function selectTxtOutput() {
 
   $("#startModal").empty().append(txt);
   $('#btn-TryAgain').click(practiceReset);
-  //$('.shareMe').click({containerId: "shareScore"}, CopyToClipboard);
-  $('.shareMe').click(mobileShare);
+  $('.shareMe').click(function() {
+    if (window.innerWidth <= 991) {
+      mobileShare();
+    }else {
+      CopyToClipboard();
+    }
+  });
+
   tabSwitch ? tabSwitch = false : toggleModal();
 }
 
