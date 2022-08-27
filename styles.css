@@ -162,7 +162,13 @@ table, td {
 
 .modalPadding {
   background-color: #fff;
-  margin: 5vw;
+  padding: 5%;
+  position: absolute;
+  left:0;
+  bottom: 0;
+  top: 0;
+  right: 10%;
+  overflow-y: auto;
 }
 
 .startButton {
@@ -185,14 +191,23 @@ table, td {
   margin-right: 10px;
 }
 
-/* #temp_element {
+/* Menu Tab */
+.menu-list {
+  width: 10%;
+  box-sizing: border-box;
   position: absolute;
   right: 0;
-  left:0;
+  left:90%;
   bottom: 0;
-  height: 200px;
-  z-index: 99;
-} */
+  top: -1px;
+  border-left: 1px solid black;
+}
+
+.menu-icon {
+  font-size: 4vh;
+  margin: 15% auto;
+}
+
 
 /* GameBoard */
 .col-1 {

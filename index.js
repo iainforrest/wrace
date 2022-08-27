@@ -36,7 +36,11 @@ const modalText = {
     <button type="button" class="shareMe startButton"><span class="material-symbols-outlined share-icon">share</span> Share</button>`
   },
   practice: `Coming Soon`,
-  menu: `Menu Coming Soon`
+  menu: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse non mollis erat, non commodo est. Cras vulputate id elit id mollis. Integer sodales eros et magna posuere, sed laoreet mi dictum. Mauris semper porttitor justo. Sed vulputate nisl in nisl mattis, id eleifend nibh lacinia. Nam tincidunt lorem in lectus bibendum, nec ullamcorper orci semper. Maecenas eu sapien sagittis eros ornare vestibulum. Aliquam vel bibendum enim, eget malesuada sapien. Duis laoreet mattis tellus, eget pulvinar nibh varius a. Aliquam lacus ipsum, maximus ac ligula et, accumsan rhoncus augue. Maecenas ac elit pellentesque, mollis erat pellentesque, finibus nisi. Nunc ac quam ac est rhoncus fermentum in quis mauris. Sed tempor lorem non augue condimentum, a elementum turpis imperdiet. Maecenas magna lacus, accumsan vitae lorem sed, interdum rhoncus sem.</p>
+  <p>Morbi at cursus sapien. Nulla hendrerit quam sed erat hendrerit facilisis in in quam. Suspendisse libero risus, pretium in sagittis sed, porta ut diam. Integer interdum ultrices augue et ultrices. Mauris ut tortor id tellus fringilla fermentum ut et eros. Nam ut libero rutrum, tincidunt massa eget, mattis purus. Fusce gravida elit et magna sodales, ut hendrerit velit ultrices. Aenean odio odio, elementum in nulla non, suscipit venenatis mi.</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse non mollis erat, non commodo est. Cras vulputate id elit id mollis. Integer sodales eros et magna posuere, sed laoreet mi dictum. Mauris semper porttitor justo. Sed vulputate nisl in nisl mattis, id eleifend nibh lacinia. Nam tincidunt lorem in lectus bibendum, nec ullamcorper orci semper. Maecenas eu sapien sagittis eros ornare vestibulum. Aliquam vel bibendum enim, eget malesuada sapien. Duis laoreet mattis tellus, eget pulvinar nibh varius a. Aliquam lacus ipsum, maximus ac ligula et, accumsan rhoncus augue. Maecenas ac elit pellentesque, mollis erat pellentesque, finibus nisi. Nunc ac quam ac est rhoncus fermentum in quis mauris. Sed tempor lorem non augue condimentum, a elementum turpis imperdiet. Maecenas magna lacus, accumsan vitae lorem sed, interdum rhoncus sem.</p>
+  <p>Morbi at cursus sapien. Nulla hendrerit quam sed erat hendrerit facilisis in in quam. Suspendisse libero risus, pretium in sagittis sed, porta ut diam. Integer interdum ultrices augue et ultrices. Mauris ut tortor id tellus fringilla fermentum ut et eros. Nam ut libero rutrum, tincidunt massa eget, mattis purus. Fusce gravida elit et magna sodales, ut hendrerit velit ultrices. Aenean odio odio, elementum in nulla non, suscipit venenatis mi.</p>
+  <p>Sed ligula neque, sollicitudin ac ornare vel, elementum quis purus. Quisque in ex massa. Pellentesque urna est, convallis id facilisis a, blandit eget lacus. Aenean commodo pharetra ex. Nulla semper congue sem vitae feugiat. Curabitur eget venenatis nisl, vel euismod ante. In non lorem at quam vulputate fringilla eu eu tellus. Maecenas ut congue lacus, et mollis lacus. Donec tempus metus turpis, quis blandit leo facilisis non.</p>`
 };
 
 var currentTab, pauseTab;
@@ -381,19 +385,6 @@ function startCountdown() {
 }
 
 
-// function openingToastr(){
-//   toastr.info(
-//   'Click HERE to start...',
-//   'Ready to Play?',
-//   {
-//     showDuration: 500,
-//     hideDuration: 500,
-//     positionClass: "toast-top-center",
-//     onHidden: startCountdown
-//   }
-// );
-// }
-
 function setUpScreenFromState(){
   createSecretWordsArray();
   startCountdown();
@@ -516,8 +507,10 @@ function tabSwitching() {
   }
   currentTab = $(this)[0];
   if (currentTab != menuTab) {
+    // $('.menu-list').hide();
     loadCurrentStateText();
   }else {
+    // $('.menu-list').show();
     selectTxtOutput();
   }
 }
