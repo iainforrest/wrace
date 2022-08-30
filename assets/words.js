@@ -7,3 +7,5 @@ const wordArray = allWords.split(" ");
 
 const wordList = new Set(wordArray);
 const allowedWordList = new Set(allowedWords.split(" "));
+
+export {wordArray, wordList, allowedWordList};

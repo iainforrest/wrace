@@ -1,13 +1,16 @@
+import MersenneTwister from './assets/rando.js';
+import {wordArray, wordList, allowedWordList} from './assets/words.js';
+
 const keyboardLetters = [
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
   ['⌫', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '↲']
-]
+];
 const numberOfGuesses = 6;
 const timerLength = 60;
 const noOfWords = 10;
 const lengthOfWordsArray = wordArray.length;
-const seedValue = Math.floor((new Date() - new Date(2022, 06, 10)) / 86400000);
+const seedValue = Math.floor((new Date() - new Date(2022, 6, 10)) / 86400000);
 const noOfHints = [4, 3, 3, 3, 2, 2, 2, 1, 1, 0];
 
 const scoreEmojis = ["😢 Better luck next time.", "🙂 Well Done.", "😁 You're AWESOME!"];
@@ -108,7 +111,7 @@ function loadCurrentState(location) {
 // Creates the secret words lists based off the array of random numbers that is stored in the currentState
 function createSecretWordsArray() {
   secretWordList = [];
-  for (i = 0; i < noOfWords; i++) {
+  for (let i = 0; i < noOfWords; i++) {
     let newWord = wordArray[Math.floor(currentState.randoArray[i] * lengthOfWordsArray)];
     while (secretWordList.includes(newWord)) {
       newWord = wordArray[Math.floor(currentState.randoArray[i] * lengthOfWordsArray)];
@@ -120,7 +123,7 @@ function createSecretWordsArray() {
 
 function createHints(indexNo, rando) {
   let hints = [];
-  for (i = 0; i < noOfHints[indexNo]; i++) {
+  for (let i = 0; i < noOfHints[indexNo]; i++) {
     let hintToAdd = Math.floor(rando.random() * 5);
     while (hints.includes(hintToAdd)) {
       hintToAdd = Math.floor(rando.random() * 5);
@@ -133,10 +136,10 @@ function createHints(indexNo, rando) {
 //create game board rows
 function newGameBoard() {
   $('.wordContainer').html("");
-  for (i = 0; i < numberOfGuesses; i++) {
+  for (let i = 0; i < numberOfGuesses; i++) {
     - // 5 rows
     $('.wordContainer').append(letterBoxRowHTML); //add row
-    for (j = 0; j < 5; j++) {
+    for (let j = 0; j < 5; j++) {
       $('.letterBoxRow').last().append(letterBoxHTML); // ad 5 boxes to each row
     }
 
@@ -146,7 +149,7 @@ function newGameBoard() {
 
 //create keyboard
 function createKeyboard() {
-  for (i = 0; i < 3; i++) { // 3 rows
+  for (let i = 0; i < 3; i++) { // 3 rows
     $('.keyboard').append(keyboardRowHTML); //append row
     keyboardLetters[i].forEach(function(value, index, array) { //for each letter in the array of letter arrays
       $('.keyboardRow').last().append(buttonKeyHTML); //append button HTML
@@ -164,7 +167,7 @@ function createKeyboard() {
 //Load hints onto the current row
 function loadGameBoardHintRow() {
   currentRow = $('.letterBoxRow').eq(0); // Top row
-  for (i = 0; i < secretWord.length; i++) {
+  for (let i = 0; i < secretWord.length; i++) {
     if (currentState.hintsArray[currentState.wordsCorrect].includes(i)) {
       currentRow.children().eq(i).addClass("correct").text(secretWord[i]);
     } else {
@@ -214,7 +217,7 @@ function scoreBoard() {
 function getAllIndexes(arr, val) {
   var indexes = [],
     i;
-  for (i = 0; i < arr.length; i++)
+  for (let i = 0; i < arr.length; i++)
     if (arr[i] === val)
       indexes.push(i);
   return indexes;
@@ -224,7 +227,7 @@ function getAllIndexes(arr, val) {
 function checkRow() {
   rowComplete = 1;
   currentGuess = "";
-  for (i = 0; i < 5; i++) { //loop through boxes on the row and build out "currentGuess"
+  for (let i = 0; i < 5; i++) { //loop through boxes on the row and build out "currentGuess"
     currentGuess += currentRow.children().eq(i).html().toUpperCase();
   }
   isWord = (allowedWordList.has(currentGuess) || wordList.has(currentGuess));
@@ -291,7 +294,7 @@ function newWord() {
 
 function emojiresult () {
   let x ="";
-  for (i=0; i< noOfWords; i++){
+  for (let i=0; i< noOfWords; i++){
     x += (i<currentState.wordsCorrect ? "🟩" : (i == currentState.wordsCorrect ? "🟥" : "🔲"));
   }
   return x;
