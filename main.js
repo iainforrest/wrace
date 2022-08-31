@@ -496,14 +496,16 @@ function selectTxtOutput() {
         break;
       default:
     }
-  }
-  //add practicing to if on Practice Tab
-  if (currentState.gameOver){
-    if (currentTab == practiceTab){
-      txt += `<p>Would you like to practice again?</p>
-      <button type="button" class="startButton" id="btn-TryAgain">Try Again</button>`;
+
+    //add practicing to if on Practice Tab
+    if (currentState.gameOver){
+      if (currentTab == practiceTab){
+        txt += `<p>Would you like to practice again?</p>
+        <button type="button" class="startButton" id="btn-TryAgain">Try Again</button>`;
+      }
     }
   }
+
 
   $("#startModal").empty().append(txt);
   $('#btn-TryAgain').click(practiceReset);
