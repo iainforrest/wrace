@@ -140,6 +140,7 @@ table, td {
 .menuTab {
   width: 10%;
   right:0;
+  cursor: default;
 }
 
 .hide {
@@ -206,6 +207,10 @@ table, td {
 .menu-icon {
   font-size: 4vh;
   margin: 15% auto;
+}
+
+.menu-item {
+  cursor: pointer;
 }
 
 
