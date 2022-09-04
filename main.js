@@ -44,7 +44,7 @@ const modalText = {
   practiceStats: `Practice Stats are coming soon`,
   dailyStats:`Daily Stats are coming soon`,
   settings:`Settings are coming soon`,
-  donate:`Options to donate are coming soon`
+  donate:`<a href="https://www.buymeacoffee.com/kindredworld" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>`
 
 };
 
