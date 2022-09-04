@@ -30,21 +30,37 @@ const modalText = {
   <p>The clock has stopped and you can come back any time today</p>`,
   gameOver: function() {
     let emojis = emojiresult();
-    return `${(currentState.wordsCorrect >= noOfWords) ? `<p>CONGRATULATIONS, YOU WIN.</p>`: `<p>Sorry, you lose. The Final word was : ${currentState.lastWord}</p>`}
+    return `<p class="results">${(currentState.wordsCorrect >= noOfWords) ? `CONGRATULATIONS, YOU WIN.</p>`: `Sorry, you lose. The Final word was : ${currentState.lastWord}</p>`}
     <div id="shareScore">
-    <p>${emojis}<br>
+    <p class="results">${emojis}<br>
     You got ${currentState.wordsCorrect}/10 words correct.</p>
-    <p>Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 1000 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
+    <p class="results">Your score today is ${currentState.finalScore}. ${(currentState.finalScore < 100) ? `${scoreEmojis[0]}` : (currentState.finalScore < 1000 ? `${scoreEmojis[1]}` : `${scoreEmojis[2]}`) } </p>
     </div>
-    <p>Your all time ${tabTxt} High Score is ${(currentTab == dailyTab) ? localStorage.dailyHighScore : localStorage.practiceHighScore }.</p>
+    <p class="results">Your all time ${tabTxt} High Score is ${(currentTab == dailyTab) ? localStorage.dailyHighScore : localStorage.practiceHighScore }.</p>
     <button type="button" class="shareMe startButton"><span class="material-symbols-outlined share-icon">share</span> Share</button>`
   },
   practice: `Coming Soon`,
   menu: `Menu coming soon`,
   practiceStats: `Practice Stats are coming soon`,
   dailyStats:`Daily Stats are coming soon`,
-  settings:`Settings are coming soon`,
-  donate:`<a href="https://www.buymeacoffee.com/kindredworld" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>`
+  howToPlay:`<p>More information on how to play coming soon</p>
+  <p>For now, the simplest way to explain this is to go and play a gamme of <a href="https://www.nytimes.com/games/wordle/index.html">Wordle</a> over at the NY Times.<br>
+  Then come back here, this is the same basic gameplay, except instead of only haveing one word to solve, you have Ten!</p>
+  <p>Then to add to the fun, there is a 60 second time limit to get each word.</p>
+  <p>We also start buy giving you some hints, then as you progress you get less clues and on the final word, you get none.</p>
+  <h3>Scoring</h3>
+  <p>You get 150 points for evey correct word<br>
+  You loose 1 point for every second that it takes you to guess the word,<br>
+  You loose 10 points for every guess that you take.</p>
+  <p>So less guesses and completed faster earns you more points!<br>
+  ie. if you get the word right in 5 gusesses and 20 seconds, you would get 80 points,<br>
+  if you get it right in 2 guesses and 40 seconds you would get 90 points.</p>
+  <p>Everyone gets the same words and hints every day, so share your score with your friends and see who the best is!</p>`,
+  donate:`<h3>Donate to help keep this running</h3>
+  <p>If you love Wrace.me as much as I do, then please consider donating the price of a coffee to help keep this site up and running</p>
+  <p>We really don't want to have to use Ads to pay for everything.</p>
+  <p>So THANK YOU for donating and helping keep this site pure and simple</p>
+  <a href="https://www.buymeacoffee.com/kindredworld" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>`
 
 };
 
@@ -56,7 +72,7 @@ const menuTab = $('#menuTab')[0];
 var currentMenuItemTab = $('#menu-info')[0];
 const menuInfoTab = $('#menu-info')[0];
 const menuStatsTab = $('#menu-stats')[0];
-const menuSettingsTab = $('#menu-settings')[0];
+const menuhowToPlayTab = $('#menu-howToPlay')[0];
 const menuDonateTab = $('#menu-donate')[0];
 
 
@@ -468,8 +484,8 @@ function practiceReset(){
 function selectTxtOutput() {
   tabTxt = currentTab == practiceTab ? "Practice" : "Daily";
   let txt = "";
-  if (currentMenuItemTab == menuSettingsTab){
-    txt = modalText.settings;
+  if (currentMenuItemTab == menuhowToPlayTab){
+    txt = modalText.howToPlay;
   }else if (currentMenuItemTab == menuDonateTab){
     txt = modalText.donate;
   }else if (currentMenuItemTab == menuStatsTab) {
@@ -500,7 +516,7 @@ function selectTxtOutput() {
     //add practicing to if on Practice Tab
     if (currentState.gameOver){
       if (currentTab == practiceTab){
-        txt += `<p>Would you like to practice again?</p>
+        txt += `<p class="results">Would you like to practice again?</p>
         <button type="button" class="startButton" id="btn-TryAgain">Try Again</button>`;
       }
     }

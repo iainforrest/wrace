@@ -24,6 +24,10 @@ h1 {
   margin: auto;
 }
 
+p {
+  text-align: left;
+}
+
 
 
 /* Title Section and gameboard */
@@ -131,6 +135,7 @@ table, td {
 
 .modalTabText{
   margin: 1.5vh 0;
+  text-align: center;
 }
 
 .playTab{
@@ -172,6 +177,10 @@ table, td {
   overflow-y: auto;
 }
 
+.results {
+  text-align: center;
+}
+
 .startButton {
   border-radius: 2rem;
   background-color: #51AD48;
@@ -191,6 +200,8 @@ table, td {
 .share-icon {
   margin-right: 10px;
 }
+
+
 
 /* Menu Tab */
 .menu-list {
