@@ -15,6 +15,10 @@ const noOfHints = [4, 3, 3, 3, 2, 2, 2, 1, 1, 0];
 
 const scoreEmojis = ["😢 Better luck next time.", "🙂 Well Done.", "😁 You're AWESOME!"];
 
+const playPauseBtnHTML = `<div class="playPause">
+  <span class="material-symbols-outlined playPauseBtn correct" id="btnPlayPauseInline"> play_pause </span>
+</div>`;
+
 const modalText = {
   start: `<p>Welcome to Wrace.</p>
   <p>The word racing game inspired by Wordle</p>
@@ -36,7 +40,11 @@ const modalText = {
     <button type="button" class="shareMe startButton"><span class="material-symbols-outlined share-icon">share</span> Share</button>`
   },
   practice: `Coming Soon`,
-  menu: `Menu coming soon`
+  menu: `Menu coming soon`,
+  practiceStats: `Practice Stats are coming soon`,
+  dailyStats:`Daily Stats are coming soon`,
+  settings:`Settings are coming soon`,
+  donate:`<a href="https://www.buymeacoffee.com/kindredworld" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>`
 
 };
 
@@ -44,6 +52,12 @@ var currentTab, pauseTab;
 const practiceTab = $('#practiceTab')[0];
 const dailyTab = $('#dailyTab')[0];
 const menuTab = $('#menuTab')[0];
+
+var currentMenuItemTab = $('#menu-info')[0];
+const menuInfoTab = $('#menu-info')[0];
+const menuStatsTab = $('#menu-stats')[0];
+const menuSettingsTab = $('#menu-settings')[0];
+const menuDonateTab = $('#menu-donate')[0];
 
 
 var tabTxt;
@@ -454,8 +468,16 @@ function practiceReset(){
 function selectTxtOutput() {
   tabTxt = currentTab == practiceTab ? "Practice" : "Daily";
   let txt = "";
-  if (currentTab == menuTab) {
-    txt = modalText.menu;
+  if (currentMenuItemTab == menuSettingsTab){
+    txt = modalText.settings;
+  }else if (currentMenuItemTab == menuDonateTab){
+    txt = modalText.donate;
+  }else if (currentMenuItemTab == menuStatsTab) {
+    txt = (currentTab == dailyTab) ? modalText.dailyStats : modalText.practiceStats;
+  // }
+  //
+  // if (currentTab == menuTab) {
+  //   txt = modalText.menu;
   } else {
     switch (currentState.gameState) {
       case notStarted:
@@ -463,26 +485,33 @@ function selectTxtOutput() {
         if (!localStorage.dailyHighScore && currentTab == dailyTab){
           txt += modalText.firstTimer;
         }
+        txt+= playPauseBtnHTML;
         break;
       case paused:
         txt = modalText.pause;
+        txt+= playPauseBtnHTML;
         break;
       case gameFinished:
         txt = modalText.gameOver();
         break;
       default:
     }
-  }
-  //add practicing to if on Practice Tab
-  if (currentState.gameOver){
-    if (currentTab == practiceTab){
-      txt += `<p>Would you like to practice again?</p>
-      <button type="button" class="startButton" id="btn-TryAgain">Try Again</button>`;
+
+    //add practicing to if on Practice Tab
+    if (currentState.gameOver){
+      if (currentTab == practiceTab){
+        txt += `<p>Would you like to practice again?</p>
+        <button type="button" class="startButton" id="btn-TryAgain">Try Again</button>`;
+      }
     }
   }
 
+
   $("#startModal").empty().append(txt);
   $('#btn-TryAgain').click(practiceReset);
+  //pause and unpause
+  $("#btnPlayPauseInline").click(gamePlayPause);
+
   $('.shareMe').click(function() {
     let shareText = `Wrace.me - ${(currentTab == dailyTab) ?"Daily " : "Practice "} #${seedValue} \n`;
     if (window.innerWidth <= 991) {
@@ -499,17 +528,12 @@ function tabSwitching() {
   tabSwitch = true;
   $(currentTab).toggleClass("wrong correct black-bottom-border");
   $(this).toggleClass("wrong correct black-bottom-border");
-  if (currentTab != menuTab) {
-    saveCurrentStateToLocalStorage(currentTab == dailyTab ? "dailyState" : "practiceState");
-  }
+  saveCurrentStateToLocalStorage(currentTab == dailyTab ? "dailyState" : "practiceState");
   currentTab = $(this)[0];
-  if (currentTab != menuTab) {
-    // $('.menu-list').hide();
-    loadCurrentStateText();
-  }else {
-    // $('.menu-list').show();
-    selectTxtOutput();
-  }
+  $('.menu-item').removeClass('correct');
+  $('#menu-info').addClass('correct');
+  currentMenuItemTab = $('#menu-info')[0];
+  loadCurrentStateText();
 }
 
 function saveCurrentStateToLocalStorage(location){
@@ -617,12 +641,22 @@ function setListeners() {
   $("#btnPlayPause").click(gamePlayPause);
 
   //switching between daily and practice tabs
-  $('.modalTab').click(tabSwitching);
+  $('.playTab').click(tabSwitching);
+
+  //menu tab items
+  $('.menu-item').click(menuTabSwitch);
 
   //save current state if the user leaves the screen
   document.addEventListener("visibilitychange", userLeavingPage);
 }
 
+function menuTabSwitch () {
+  $('.menu-item').removeClass('correct');
+  $(this).addClass('correct');
+  currentMenuItemTab = $(this)[0];
+  tabSwitch = true;
+  selectTxtOutput();
+}
 
 function loadCurrentStateText (){
   loadCurrentState(currentTab == dailyTab ? "dailyState" : "practiceState");
