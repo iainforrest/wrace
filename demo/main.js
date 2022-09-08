@@ -30,7 +30,7 @@ const modalText = {
   <p>The clock has stopped and you can come back any time today</p>`,
   gameOver: function() {
     let emojis = emojiresult();
-    return `<p class="results">${(currentState.wordsCorrect >= noOfWords) ? `CONGRATULATIONS, YOU WIN.</p>`: `Sorry, you lose. The Final word was : ${currentState.lastWord}</p>`}
+    return `<p class="results">${(currentState.wordCounter >= noOfWords) ? `CONGRATULATIONS, YOU WIN.</p>`: `Sorry, you lose. The Final word was : ${currentState.lastWord}</p>`}
     <div id="shareScore">
     <p class="results">${emojis}<br>
     You got ${currentState.wordsCorrect}/10 words correct.</p>
@@ -121,7 +121,9 @@ function loadCurrentState(location) {
     currentState = {
       gameState: notStarted,
       guessesOnCurrentWord: [],
-      wordsCorrect: 0,
+      wordCounter: 0,
+      wordsCorrect:0,
+      wordChecker:[],
       finalScore: timerLength,
       reloadSite: "false",
       gameOver: false,
@@ -199,7 +201,7 @@ function createKeyboard() {
 function loadGameBoardHintRow() {
   currentRow = $('.letterBoxRow').eq(0); // Top row
   for (let i = 0; i < secretWord.length; i++) {
-    if (currentState.hintsArray[currentState.wordsCorrect].includes(i)) {
+    if (currentState.hintsArray[currentState.wordCounter].includes(i)) {
       currentRow.children().eq(i).addClass("correct").text(secretWord[i]);
     } else {
       currentRow.children().eq(i).addClass("wrong").text("*");
@@ -236,7 +238,7 @@ function loadGameBoardRow() {
 
 function scoreBoard() {
   //if reloading from finshed game then you want to show 10 not 11
-  let scoreboardCount = currentState.wordsCorrect + (currentState.wordsCorrect == 10 ? 0:1);
+  let scoreboardCount = currentState.wordCounter + (currentState.wordCounter == 10 ? 0:1);
   let score10 = Math.floor(scoreboardCount / 10);
   let score1 = scoreboardCount % 10;
   $('.score-10').text(score10);
@@ -314,7 +316,7 @@ function newWord() {
   if (currentState.gameState == playing) {
     currentState.countdown = timerLength - 1;
   } //dont reset if loading from saved data
-  secretWord = secretWordList[currentState.wordsCorrect - (currentState.wordsCorrect ==10 ? 1:0 )];
+  secretWord = secretWordList[currentState.wordCounter - (currentState.wordCounter ==10 ? 1:0 )];
   newGameBoard();
   scoreBoard();
   $(".keyBtn").removeClass("correct wrongPosition wrong");
@@ -326,7 +328,7 @@ function newWord() {
 function emojiresult () {
   let x ="";
   for (let i=0; i< noOfWords; i++){
-    x += (i<currentState.wordsCorrect ? "🟩" : (i == currentState.wordsCorrect ? "🟥" : "🔲"));
+    x += (currentState.wordChecker[i] ? "🟩" : "🟥");
   }
   return x;
 }
@@ -396,13 +398,32 @@ function countdownTimer() {
       $("#count").text(currentState.countdown)
       currentState.countdown--;
       if (currentState.countdown <= -1) {
-        gameOver();
+        wordOver(false);
       }
     }
 
   }, 1000);
 }
 
+function wordOver(correct) {
+  currentState.wordChecker.push((correct)? true : false );
+  currentState.wordsCorrect += (correct)? 1 :0;
+  console.log(currentState.wordChecker);
+  // minus time taken
+  currentState.finalScore -= timerLength - currentState.countdown;
+  // add 100 for a correct word
+  currentState.finalScore += (correct) ? 100 : -currentState.countdown ;
+  // add 10 for guesses taken 5 gueses = 0, 1 guess = 50
+  currentState.finalScore += (numberOfGuesses - attempt)*10;
+  currentState.wordCounter++;
+  if (currentState.wordCounter == noOfWords) {
+    gameOver();
+  } else {
+    currentState.guessesOnCurrentWord = []; //remove gueses from current state
+    newWord();
+  }
+
+}
 
 function startCountdown() {
   $('#count').text(currentState.countdown + 1);
@@ -601,24 +622,12 @@ function KeyboardPressed(keyPressed) {
           checkWord();
           currentState.guessesOnCurrentWord.push(currentGuess);
           if (currentGuess == secretWord) {
-            // minus time taken
-            currentState.finalScore -= timerLength - currentState.countdown;
-            // add 100 for a correct word
-            currentState.finalScore += 100;
-            // add 10 for guesses taken 5 gueses = 0, 1 guess = 50
-            currentState.finalScore += (numberOfGuesses - attempt)*10;
-            currentState.wordsCorrect++;
-            if (currentState.wordsCorrect == noOfWords) {
-              gameOver();
-            } else {
-              currentState.guessesOnCurrentWord = []; //remove gueses from current state
-              newWord();
-            }
+            wordOver(true);
           } else {
 
             attempt++;
             if (attempt == numberOfGuesses) {
-               gameOver();
+               wordOver(false);
             } else {
               loadGameBoardRow();
             }
