@@ -22,15 +22,16 @@ const playPauseBtnHTML = `<div class="playPause">
 const modalText = {
   start: `<h3>Welcome to Wrace</h3>
   <p>The word racing game inspired by Wordle</p>
-  <p>Battle the clock and see how far you can get.
-  Everyone gets the same words every day, so race your friends and see who wins.</p>`,
+  <p>Battle the clock and race through the 10 words. You get points for every word correct and lose points when you can't solve them in time.<br>
+  Everyone gets the same words every day, so share your score with your friends and see who wins.</p>`,
   firstTimer: `<p>If this is your first time here, then you might want to try a Practice session first. There's only 1 daily challenge each day.</p>
   <p>Just click on the Practice tab above then on the Play button up the top</p>`,
-  pause: `<p>You have paused Wrace</p>
-  <p>The clock has stopped and you can come back any time today</p>`,
+  pause: `<h3>Game Paused</h3>
+  <p>You have paused Wrace</p>
+  <p>The clock has stopped and you can come back any time you want. However, daily games reset at midnight.</p>`,
   gameOver: function() {
     let emojis = emojiresult();
-    return `<p class="results">${(currentState.wordCounter >= noOfWords) ? `CONGRATULATIONS, YOU WIN.</p>`: `Sorry, you lose. The Final word was : ${currentState.lastWord}</p>`}
+    return `<p class="results">CONGRATULATIONS, You Made It.</p>
     <div id="shareScore">
     <p class="results">${emojis}<br>
     You got ${currentState.wordsCorrect}/10 words correct.</p>
@@ -39,19 +40,19 @@ const modalText = {
     <p class="results">Your all time ${tabTxt} High Score is ${(currentTab == dailyTab) ? localStorage.dailyHighScore : localStorage.practiceHighScore }.</p>
     <button type="button" class="shareMe startButton"><span class="material-symbols-outlined share-icon">share</span> Share</button>`
   },
-  practice: `Coming Soon`,
-  menu: `Menu coming soon`,
   practiceStats: `Practice Stats are coming soon`,
   dailyStats:`Daily Stats are coming soon`,
   howToPlay:`<p>More information on how to play coming soon</p>
+  <h3>How to play</h3>
   <p>For now, the simplest way to explain this is to go and play a gamme of <a href="https://www.nytimes.com/games/wordle/index.html">Wordle</a> over at the NY Times.<br>
   Then come back here, this is the same basic gameplay, except instead of only haveing one word to solve, you have Ten!</p>
   <p>Then to add to the fun, there is a 60 second time limit to get each word.</p>
-  <p>We also start buy giving you some hints, then as you progress you get less clues and on the final word, you get none.</p>
+  <p>Every round comes with a hint at the top, we start buy giving you 4 of the 5 letters, then as you progress you get less letters and on the final word, you get none.</p>
   <h3>Scoring</h3>
   <p>You get 150 points for evey correct word<br>
   You loose 1 point for every second that it takes you to guess the word,<br>
-  You loose 10 points for every guess that you take.</p>
+  You loose 10 points for every guess that you take.<br>
+  Fail to solve the word and you loose 60 points.</p>
   <p>So less guesses and completed faster earns you more points!<br>
   ie. if you get the word right in 5 gusesses and 20 seconds, you would get 80 points,<br>
   if you get it right in 2 guesses and 40 seconds you would get 90 points.</p>
@@ -448,17 +449,22 @@ function countdownToast(i) {
 
 }
 
+
 function wordOver(correct) {
   currentState.gameState = paused;
   currentState.wordChecker.push((correct)? true : false );
   currentState.wordsCorrect += (correct)? 1 :0;
   let scoreThisWord = 0;
-  // minus time taken
-  scoreThisWord -= timerLength - currentState.countdown;
-  // add 100 for a correct word
-  scoreThisWord += (correct) ? 100 : -currentState.countdown ;
-  // add 10 for guesses taken 5 gueses = 0, 1 guess = 50
-  scoreThisWord += (numberOfGuesses - attempt)*10;
+  if (!correct){
+    scoreThisWord = -60;
+  }else {
+    // minus time taken
+    scoreThisWord -= timerLength - currentState.countdown;
+    // add 100 for a correct word
+    scoreThisWord += (correct) ? 100 : -currentState.countdown ;
+    // add 10 for guesses taken 5 gueses = 0, 1 guess = 50
+    scoreThisWord += (numberOfGuesses - attempt)*10;
+  }
   currentState.finalScore += scoreThisWord;
   currentState.wordCounter++;
   Toastify({
