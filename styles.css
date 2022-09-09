@@ -28,6 +28,13 @@ p {
   text-align: left;
 }
 
+.word-complete {
+  padding: 5vh;
+  font-size: 1rem;
+  border: solid 1px black;
+  border-radius: 20px;
+  box-shadow: 0 4px 4px 0 rgb(0 0 0 / 20%), 6px 0 20px 0 rgb(0 0 0 / 19%);
+}
 
 
 /* Title Section and gameboard */
@@ -305,22 +312,22 @@ table, td {
 }
 
 .wrong {
-  background-color: #73787B;
+  background: #73787B;
   color: #fff;
 }
 
 .wrongPosition {
-  background-color: #DAB71B;
+  background: #DAB71B;
   color: #fff;
 }
 
 .correct{
-  background-color: #51AD48;
+  background: #51AD48;
   color: #fff;
 }
 
 .pauseGame {
-  background-color: #E20404;
+  background: #E20404;
   color: #fff;
 }
 

@@ -1,5 +1,5 @@
-import MersenneTwister from '/assets/rando.js';
-import {wordArray, wordList, allowedWordList} from '/assets/words.js';
+import MersenneTwister from './assets/rando.js';
+import {wordArray, wordList, allowedWordList} from './assets/words.js';
 
 const keyboardLetters = [
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -61,6 +61,12 @@ const modalText = {
   <p>We really don't want to have to use Ads to pay for everything.</p>
   <p>So THANK YOU for donating and helping keep this site pure and simple</p>
   <a href="https://www.buymeacoffee.com/kindredworld" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>`
+
+};
+
+const toastText ={
+  wordCorrect: function () {return `CONGRATULATIONS!\nYou got the word right!`},
+  wordWrong:function () {return `Sorry\nYou got the word wrong.\nThe final word was ${secretWord}`}
 
 };
 
@@ -327,7 +333,7 @@ function newWord() {
 
 function emojiresult () {
   let x ="";
-  if (currentState.wordChecker.length() = noOfWords){
+  if (currentState.wordChecker.length == noOfWords){
     for (let i=0; i< noOfWords; i++){
       x += (currentState.wordChecker[i] ? "🟩" : "🟥");
     }
@@ -408,10 +414,44 @@ function countdownTimer() {
   }, 1000);
 }
 
+function countdownToast(i) {
+  if (i==0){
+    if (currentState.wordCounter == noOfWords) {
+      gameOver();
+    }else {
+      currentState.guessesOnCurrentWord = []; //remove gueses from current state
+      currentState.gameState = playing;
+      startCountdown();
+    }
+    return;
+  }
+  if (currentState.wordCounter == noOfWords) {
+    setTimeout(function(){
+      countdownToast(i-1);
+    },300);
+  }else {
+    Toastify({
+      text: (i == 4)? "Loading Next Word In..." : i ,
+      className: `pauseGame`,
+      gravity: "top", // `top` or `bottom`
+      position: "center",
+      offset: {
+      // x: '40vw', // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+      y: '25vh' // vertical axis - can be a number or a string indicating unity. eg: '2em'
+      },
+      duration: 750,
+      stopOnFocus: false,
+      callback: function() {countdownToast(i-1)},
+
+    }).showToast();
+  }
+
+}
+
 function wordOver(correct) {
+  currentState.gameState = paused;
   currentState.wordChecker.push((correct)? true : false );
   currentState.wordsCorrect += (correct)? 1 :0;
-  console.log(currentState.wordChecker);
   // minus time taken
   currentState.finalScore -= timerLength - currentState.countdown;
   // add 100 for a correct word
@@ -419,13 +459,25 @@ function wordOver(correct) {
   // add 10 for guesses taken 5 gueses = 0, 1 guess = 50
   currentState.finalScore += (numberOfGuesses - attempt)*10;
   currentState.wordCounter++;
-  if (currentState.wordCounter == noOfWords) {
-    gameOver();
-  } else {
-    currentState.guessesOnCurrentWord = []; //remove gueses from current state
-    newWord();
-  }
+  Toastify({
+    text: (correct)? toastText.wordCorrect() : toastText.wordWrong() ,
+    className: `word-complete ${(correct)?"correct":"wrong"}`,
+    gravity: "top", // `top` or `bottom`
+    position: "center",
+    offset: {
+    // x: '40vw', // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+    y: '25vh' // vertical axis - can be a number or a string indicating unity. eg: '2em'
+    },
+    duration: 3000,
+    stopOnFocus: false,
+    // callback: function () {
+    //
+    // },
 
+  }).showToast();
+  setTimeout(function(){
+    countdownToast(4);
+  },2000);
 }
 
 function startCountdown() {
@@ -452,18 +504,20 @@ function toggleModal() {
 }
 
 function gamePlayPause() {
-  if (localStorage.leftSite){ //if reloading from a saved state
+  if (currentState.gameState ==  gameFinished){ //if reloading from a saved state
+    tabSwitch = true;
+    // if ($('.mainModal').is(":visible")) {
+    //   if (((localStorage.lastPlayed == "dailyState") ? dailyTab : practiceTab )!= currentTab){
+    //     setUpScreenFromState();
+    //   }
+    // }else {
+    //   localStorage.setItem("lastPlayed", (currentTab == dailyTab ? "dailyState" : "practiceState"));
+    // }
+  }else if (localStorage.leftSite) {
     setUpScreenFromState();
     if (currentState.gameState == paused || currentState.gameState == notStarted ){ currentState.gameState = playing; }
-    localStorage.removeItem("leftSite")
-  }else if (currentState.gameState ==  gameFinished) {
-    if ($('.mainModal').is(":visible")) {
-      if ((localStorage.lastPlayed == "dailyState" ? dailyTab : practiceTab )!= currentTab){
-        setUpScreenFromState();
-      }
-    }else {
-      localStorage.setItem("lastPlayed", (currentTab == dailyTab ? "dailyState" : "practiceState"));
-    }
+    localStorage.removeItem("leftSite");
+
   }else if (currentState.gameState == playing){
     currentState.gameState = paused;
     localStorage.setItem("lastPlayed", currentTab == dailyTab ? "dailyState" : "practiceState");
@@ -510,10 +564,7 @@ function selectTxtOutput() {
     txt = modalText.donate;
   }else if (currentMenuItemTab == menuStatsTab) {
     txt = (currentTab == dailyTab) ? modalText.dailyStats : modalText.practiceStats;
-  // }
-  //
-  // if (currentTab == menuTab) {
-  //   txt = modalText.menu;
+
   } else {
     switch (currentState.gameState) {
       case notStarted:

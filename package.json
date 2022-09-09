@@ -1,18 +1,9 @@
 {
   "name": "wrace",
-  "targets": {
-    "": {
-      "source": "./index.html",
-      "distDir": "dist/"
-    },
-    "demo": {
-      "source": "./demo/index.html",
-      "distDir": "dist/demo"
-    }
-  },
+  "source": "./index.html",
   "scripts": {
     "start": "parcel index.html",
-    "predeploy": "rm -rf dist && parcel build --no-source-maps && cp CNAME ./dist && cp .nojekyll ./dist",
+    "predeploy": "rm -rf dist && parcel build index.html --no-source-maps && cp CNAME ./dist && cp .nojekyll ./dist",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
