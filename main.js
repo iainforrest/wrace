@@ -65,8 +65,8 @@ const modalText = {
 };
 
 const toastText ={
-  wordCorrect: function () {return `CONGRATULATIONS!\nYou got the word right!`},
-  wordWrong:function () {return `Sorry\nYou got the word wrong.\nThe final word was ${secretWord}`}
+  wordCorrect: function (scoreThisWord) {return `CONGRATULATIONS!\nYou got the word right!\n\nYou Scored ${scoreThisWord} on this word.`},
+  wordWrong:function (scoreThisWord) {return `Sorry\nYou got the word wrong.\nThe final word was ${secretWord}\n\nYou Scored ${scoreThisWord} on this word.`}
 
 };
 
@@ -431,7 +431,7 @@ function countdownToast(i) {
     },300);
   }else {
     Toastify({
-      text: (i == 4)? "Loading Next Word In..." : i ,
+      text: (i == 1)? "Loading Next Word..." : i ,
       className: `pauseGame`,
       gravity: "top", // `top` or `bottom`
       position: "center",
@@ -452,15 +452,17 @@ function wordOver(correct) {
   currentState.gameState = paused;
   currentState.wordChecker.push((correct)? true : false );
   currentState.wordsCorrect += (correct)? 1 :0;
+  let scoreThisWord = 0;
   // minus time taken
-  currentState.finalScore -= timerLength - currentState.countdown;
+  scoreThisWord -= timerLength - currentState.countdown;
   // add 100 for a correct word
-  currentState.finalScore += (correct) ? 100 : -currentState.countdown ;
+  scoreThisWord += (correct) ? 100 : -currentState.countdown ;
   // add 10 for guesses taken 5 gueses = 0, 1 guess = 50
-  currentState.finalScore += (numberOfGuesses - attempt)*10;
+  scoreThisWord += (numberOfGuesses - attempt)*10;
+  currentState.finalScore += scoreThisWord;
   currentState.wordCounter++;
   Toastify({
-    text: (correct)? toastText.wordCorrect() : toastText.wordWrong() ,
+    text: (correct)? toastText.wordCorrect(scoreThisWord) : toastText.wordWrong(scoreThisWord) ,
     className: `word-complete ${(correct)?"correct":"wrong"}`,
     gravity: "top", // `top` or `bottom`
     position: "center",
@@ -476,7 +478,7 @@ function wordOver(correct) {
 
   }).showToast();
   setTimeout(function(){
-    countdownToast(4);
+    countdownToast(1);
   },2000);
 }
 
