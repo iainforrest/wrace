@@ -16,7 +16,7 @@ const noOfHints = [4, 3, 3, 3, 2, 2, 2, 1, 1, 0];
 const scoreEmojis = ["😢 Better luck next time.", "🙂 Well Done.", "😁 You're AWESOME!"];
 
 const playPauseBtnHTML = `<div class="playPause">
-  <span class="material-symbols-outlined playPauseBtn correct" id="btnPlayPauseInline"> play_pause </span>
+  <span class="material-symbols-outlined playPauseBtn correct" id="btnPlayPauseInline"> &#xf137; </span>
 </div>`;
 
 const modalText = {
